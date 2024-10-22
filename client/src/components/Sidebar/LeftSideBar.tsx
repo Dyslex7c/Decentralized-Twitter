@@ -10,6 +10,9 @@ import {
   IoIosNotifications,
 } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { v5 as uuidv5 } from 'uuid';
 
 const bannerItems = [
   { name: "Home", icon: <IoIosHome />, route: "/home" },
@@ -24,11 +27,23 @@ const bannerItems = [
 const LeftSideBar = () => {
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState("Home");
-
+  const user = useSelector((state: RootState) => state.user);
+  const address = user?.address;
+  console.log(user);
+  
+  const NAMESPACE = process.env.REACT_APP_UUID_NAMESPACE;
   const handleClick = (name: string, route: string | undefined) => {
     setActivePage(name);
     if (route) navigate(route);
   };
+
+  const generateUserID = (address: any) => {
+    if (!NAMESPACE) return;
+    const uuid = uuidv5(address, NAMESPACE);
+    const userID = `user_${uuid.slice(0, 8)}`;
+    console.log(userID);
+    return userID;
+  }
 
   return (
     <div className="flex flex-col border-r h-screen flex-shrink-0 border-gray-700">
@@ -64,15 +79,15 @@ const LeftSideBar = () => {
 
         <div className="flex items-center">
           <img
-            src="https://www.w3schools.com/howto/img_avatar.png"
+            src= {user?.avatar}
             alt="avatar"
             height={40}
             width={40}
-            className="rounded-full mr-5"
+            className="rounded-full mr-5 bg-white"
           />
           <div className="flex flex-col text-sm">
-            <p className="font-bold">John Doe</p>
-            <p className="text-gray-500">@username</p>
+            <p className="font-bold">{user?.name}</p>
+            <p className="text-gray-500">@{generateUserID(address)}</p>
           </div>
           <div>
             <IoIosMore className="text-2xl ml-20" />

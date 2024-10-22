@@ -6,24 +6,98 @@ import {
   MdPoll,
 } from "react-icons/md";
 import { FaUserSecret } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import axios from "axios";
 
 const icons = [
-    { icon: <MdOutlinePermMedia />, tooltip: "Attach Media" },
-    { icon: <MdOutlineGif />, tooltip: "Attach GIF" },
-    { icon: <MdPoll />, tooltip: "Create Poll" },
-    { icon: <FaUserSecret />, tooltip: "Post Anonymously" },
-    { icon: <MdOutlineSchedule />, tooltip: "Schedule Post" },
-  ];
+  { key: "media", icon: <MdOutlinePermMedia />, tooltip: "Attach Media" },
+  { key: "gif", icon: <MdOutlineGif />, tooltip: "Attach GIF" },
+  { key: "poll", icon: <MdPoll />, tooltip: "Create Poll" },
+  { key: "anonymous", icon: <FaUserSecret />, tooltip: "Post Anonymously" },
+  { key: "schedule", icon: <MdOutlineSchedule />, tooltip: "Schedule Post" },
+];
+
+const PINATA_API_KEY = "3b2e9485d3d6c51ec593";
+const PINATA_SECRET_API_KEY =
+  "55ae1f11787102239d47de16abfa3b4d85aeaff15907ba38b9f2892479fb56a8";
 
 const PostBox = () => {
   const [text, setText] = useState("");
   const [postType, setPostType] = useState("Mutable");
+  const [previewMediaURL, setPreviewMediaURL] = useState<string | null>(null);
+  console.log(previewMediaURL);
+
+  const user = useSelector((state: RootState) => state.user);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
     textarea.style.height = "40px";
     textarea.style.height = `${textarea.scrollHeight}px`;
     setText(event.target.value);
+  };
+
+  const handleIconClick = async (key: string) => {
+    switch (key) {
+      case "media":
+        attachMedia();
+        break;
+      case "gif":
+        alert("GIF attachment not implemented yet.");
+        break;
+      case "poll":
+        createPoll();
+        break;
+      case "anonymous":
+        toggleAnonymousPost();
+        break;
+      case "schedule":
+        alert("Scheduling feature coming soon!");
+        break;
+      default:
+        console.warn("Invalid action!");
+    }
+  };
+
+  const attachMedia = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*,video/*";
+    input.onchange = async (event: any) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await axios.post(
+          "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          formData,
+          {
+            maxContentLength: Infinity,
+            headers: {
+              "Content-Type": `multipart/form-data`,
+              pinata_api_key: PINATA_API_KEY,
+              pinata_secret_api_key: PINATA_SECRET_API_KEY,
+            },
+          }
+        );
+        const url = `https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`;
+        setPreviewMediaURL(url);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    input.click();
+  };
+
+  const createPoll = () => {
+    alert("Poll creation is not available in this version.");
+  };
+
+  const toggleAnonymousPost = () => {
+    alert("Posting anonymously!");
   };
 
   return (
@@ -41,11 +115,11 @@ const PostBox = () => {
 
       <div className="flex flex-row items-start border-b border-gray-700 p-3">
         <img
-          src="https://www.w3schools.com/howto/img_avatar.png"
+          src={user?.avatar}
           alt="user"
           width={40}
           height={40}
-          className="rounded-full"
+          className="rounded-full bg-white"
         />
         <textarea
           placeholder="What's your Proof of Activity?"
@@ -56,16 +130,26 @@ const PostBox = () => {
         />
       </div>
 
+      {previewMediaURL && (
+        <div className="flex justify-center mt-4">
+          <img src={previewMediaURL} alt="Preview" />
+        </div>
+      )}
+
       <div className="flex flex-row items-center mt-4 ml-16 gap-2">
-      {icons.map((item, index) => (
-        <span key={index} className="relative group text-2xl cursor-pointer">
-          {item.icon}
-          <span className="absolute top-8 -left-7 w-max px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
-            {item.tooltip}
+        {icons.map((item) => (
+          <span
+            key={item.key}
+            className="relative group text-2xl cursor-pointer"
+            onClick={() => handleIconClick(item.key)}
+          >
+            {item.icon}
+            <span className="absolute top-8 -left-7 w-max px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
+              {item.tooltip}
+            </span>
           </span>
-        </span>
-      ))}
-    </div>
+        ))}
+      </div>
 
       {postType === "Immutable" && (
         <p className="text-[#ff0000] text-sm mt-8">

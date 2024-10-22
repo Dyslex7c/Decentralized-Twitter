@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import googlelogo from "../assets/google.png";
 import metamasklogo from "../assets/metamask.png";
@@ -11,6 +12,8 @@ import axios from "axios";
 import { ethers } from "ethers";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
+import { setUser } from "../state";
 
 declare global {
   interface Window {
@@ -27,7 +30,9 @@ const LoginPage = () => {
   const [address, setAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   console.log(isWalletConnected);
-  
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const toggleRegisterModal = () => {
     setRegisterModal(!registerModal);
@@ -49,7 +54,18 @@ const LoginPage = () => {
         const token = credential?.accessToken;
         const user = result.user;
         console.log(token);
-        console.log(user.displayName);
+        console.log(user);
+        if (token === null || !token) return;
+        dispatch(
+          setUser({
+            user: {
+              name: user.displayName || "User",
+              avatar: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
+            },
+            token: token,
+          })
+        );
+        navigate("/home");
       })
       .catch((err) => {
         const errorCode = err.code;
@@ -107,6 +123,17 @@ const LoginPage = () => {
       );
       return response.data;
     } catch (err: any) {
+      toast.error("Failed to authenticate with MetaMask. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        className: "toast-custom",
+      });
       if (err.response) console.error(err.response.data);
       else console.error("Error fetching SIWE message:", err.message);
     }
@@ -135,6 +162,19 @@ const LoginPage = () => {
       });
       if (response.data.success) {
         toast("Successfully authenticated with MetaMask!");
+        dispatch(
+          setUser({
+            user: {
+              name: "Anonymous",
+              address: address,
+              avatar: "https://cdn-icons-png.flaticon.com/128/10/10960.png",
+            },
+            token: "jadfkklakssl",
+          })
+        );
+        setTimeout(() => {
+          navigate("/home");
+        }, 3000);
       } else {
         alert("Authentication failed!");
       }
@@ -178,7 +218,6 @@ const LoginPage = () => {
           bodyClassName={() =>
             "text-sm text-black font-white font-med block p-3"
           }
-          style={{ fontFamily: "Poppins" }}
         />
         <div className="w-1/2 h-screen flex items-center justify-center">
           <img src={logo} alt="logo" />
