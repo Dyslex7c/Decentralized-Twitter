@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/cli": "^7.25.9",
+    "@babel/core": "^7.25.9",
+    "@babel/preset-env": "^7.25.9",
+    "@babel/register": "^7.25.9",
     "@ethersproject/providers": "^5.7.2",
     "@reduxjs/toolkit": "^2.3.0",
     "@testing-library/jest-dom": "^5.17.0",
@@ -36,7 +40,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "mocha --require ts-node/register test/*.ts",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -71,8 +75,10 @@
     "@types/mocha": "^10.0.9",
     "ajv": "^7.2.4",
     "chai": "^4.2.0",
+    "chai-as-promised": "^8.0.0",
     "hardhat": "^2.22.14",
     "hardhat-gas-reporter": "^1.0.8",
+    "mocha": "^10.7.3",
     "solidity-coverage": "^0.8.1",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.0"

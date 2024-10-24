@@ -9,6 +9,7 @@ import { FaUserSecret } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import axios from "axios";
+import { useTweetContract } from "../../hooks/useTweetContract";
 
 const icons = [
   { key: "media", icon: <MdOutlinePermMedia />, tooltip: "Attach Media" },
@@ -26,9 +27,10 @@ const PostBox = () => {
   const [text, setText] = useState("");
   const [postType, setPostType] = useState("Mutable");
   const [previewMediaURL, setPreviewMediaURL] = useState<string | null>(null);
-  console.log(previewMediaURL);
-
+  const [mediaCID, setMediaCID] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user);
+
+  const { contract } = useTweetContract();
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
@@ -85,6 +87,7 @@ const PostBox = () => {
         );
         const url = `https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`;
         setPreviewMediaURL(url);
+        setMediaCID(res.data.IpfsHash);
       } catch (err) {
         console.error(err);
       }
@@ -98,6 +101,23 @@ const PostBox = () => {
 
   const toggleAnonymousPost = () => {
     alert("Posting anonymously!");
+  };
+
+  const postTweet = async () => {
+    if (contract) {
+      try {
+        const transaction = await contract.postTweet(text, mediaCID || "");
+        await transaction.wait();
+        alert("Tweet posted successfully!");
+        setText("");
+        setPreviewMediaURL(null);
+        setMediaCID(null);
+      } catch (error) {
+        console.error("Error posting tweet:", error);
+      }
+    } else {
+      alert("Contract is not available. Please connect your wallet.");
+    }
   };
 
   return (
@@ -136,19 +156,30 @@ const PostBox = () => {
         </div>
       )}
 
-      <div className="flex flex-row items-center mt-4 ml-16 gap-2">
-        {icons.map((item) => (
-          <span
-            key={item.key}
-            className="relative group text-2xl cursor-pointer"
-            onClick={() => handleIconClick(item.key)}
-          >
-            {item.icon}
-            <span className="absolute top-8 -left-7 w-max px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              {item.tooltip}
+      <div className="flex flex-row justify-between items-center mt-4 ml-16 gap-2">
+        <div className="flex flex-row gap-2">
+          {icons.map((item) => (
+            <span
+              key={item.key}
+              className="relative group text-2xl cursor-pointer"
+              onClick={() => handleIconClick(item.key)}
+            >
+              {item.icon}
+              <span className="absolute top-8 -left-7 w-max px-2 py-1 text-xs bg-gray-700 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                {item.tooltip}
+              </span>
             </span>
-          </span>
-        ))}
+          ))}
+        </div>
+        <button
+          onClick={postTweet}
+          className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition 
+            duration-300 ease-in-out text-white p-3 px-16 rounded-full flex 
+            items-center justify-center gap-2"
+          style={{ fontFamily: "Roboto", fontWeight: 600 }}
+        >
+          Post
+        </button>
       </div>
 
       {postType === "Immutable" && (

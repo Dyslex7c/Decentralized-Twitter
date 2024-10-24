@@ -1,7 +1,6 @@
-// /hooks/contracts/useTweetContract.ts
 import { useEffect, useState } from "react";
 import { ethers, Contract, providers } from "ethers";
-import PostTweetABI from "../../artifacts/contracts/PostTweet.sol/PostTweet.json";
+import PostTweetABI from "../contracts/PostTweet.json";
 
 const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
