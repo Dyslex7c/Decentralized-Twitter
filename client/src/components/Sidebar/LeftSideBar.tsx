@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import logo from "../../assets/logo.png";
 import {
   IoIosChatboxes,
@@ -9,29 +9,40 @@ import {
   IoIosSearch,
   IoIosNotifications,
 } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { v5 as uuidv5 } from 'uuid';
+import { v5 as uuidv5 } from "uuid";
 
 const bannerItems = [
   { name: "Home", icon: <IoIosHome />, route: "/home" },
   { name: "Explore", icon: <IoIosSearch />, route: "/explore" },
-  { name: "Notifications", icon: <IoIosNotifications /> },
-  { name: "Messages", icon: <IoIosChatboxes /> },
-  { name: "Communities", icon: <IoIosPeople /> },
-  { name: "Profile", icon: <IoIosPerson /> },
+  {
+    name: "Notifications",
+    icon: <IoIosNotifications />,
+    route: "/notifications",
+  },
+  { name: "Messages", icon: <IoIosChatboxes />, route: "/messages" },
+  { name: "Communities", icon: <IoIosPeople />, route: "/communities" },
+  { name: "Profile", icon: <IoIosPerson />, route: "/profile" },
   { name: "More", icon: <IoIosMore /> },
 ];
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activePage, setActivePage] = useState("Home");
   const user = useSelector((state: RootState) => state.user);
   const address = user?.address;
-  console.log(user);
-  
+
   const NAMESPACE = process.env.REACT_APP_UUID_NAMESPACE;
+
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const activeItem = bannerItems.find((item) => item.route === currentPath);
+    setActivePage(activeItem ? activeItem.name : "Home");
+  }, [location.pathname]);
+
   const handleClick = (name: string, route: string | undefined) => {
     setActivePage(name);
     if (route) navigate(route);
@@ -41,12 +52,12 @@ const LeftSideBar = () => {
     if (!NAMESPACE) return;
     const uuid = uuidv5(address, NAMESPACE);
     const userID = `user_${uuid.slice(0, 8)}`;
-    console.log(userID);
+    localStorage.setItem("userID", userID);
     return userID;
-  }
+  };
 
   return (
-    <div className="flex flex-col border-r h-screen flex-shrink-0 border-gray-700">
+    <div className="flex flex-col fixed border-r h-screen flex-shrink-0 w-80 border-gray-700">
       <div
         className="flex flex-col p-4 pl-12 gap-y-4"
         style={{ fontFamily: "Roboto", fontWeight: 300 }}
@@ -60,8 +71,8 @@ const LeftSideBar = () => {
             key={name}
             onClick={() => handleClick(name, route)}
             className={`flex items-center gap-2 hover:text-blue-400 transition duration-300 text-xl ${
-              activePage === name ? "text-blue-600" : "text-white"
-            }`}
+              activePage === name ? "text-blue-600 bg-gray-900" : "text-white"
+            } p-2 rounded`}
           >
             <span className="text-4xl">{icon}</span>
             {name}
@@ -79,7 +90,7 @@ const LeftSideBar = () => {
 
         <div className="flex items-center">
           <img
-            src= {user?.avatar}
+            src={user?.avatar}
             alt="avatar"
             height={40}
             width={40}

@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import axios from "axios";
 import { useTweetContract } from "../../hooks/useTweetContract";
+import { toast, ToastContainer } from "react-toastify";
 
 const icons = [
   { key: "media", icon: <MdOutlinePermMedia />, tooltip: "Attach Media" },
@@ -27,6 +28,8 @@ const PostBox = () => {
   const [text, setText] = useState("");
   const [postType, setPostType] = useState("Mutable");
   const [previewMediaURL, setPreviewMediaURL] = useState<string | null>(null);
+  console.log(previewMediaURL);
+
   const [mediaCID, setMediaCID] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user);
 
@@ -108,7 +111,7 @@ const PostBox = () => {
       try {
         const transaction = await contract.postTweet(text, mediaCID || "");
         await transaction.wait();
-        alert("Tweet posted successfully!");
+        toast.success("Tweet posted successfully!");
         setText("");
         setPreviewMediaURL(null);
         setMediaCID(null);
@@ -122,6 +125,7 @@ const PostBox = () => {
 
   return (
     <div className="flex flex-col relative">
+      <ToastContainer />
       <div className="absolute top-2 right-4">
         <select
           value={postType}

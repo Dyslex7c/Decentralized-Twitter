@@ -6,7 +6,6 @@ const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 export const useRetrieveTweetsByUser = (userAddress: string) => {
   const [tweets, setTweets] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadTweets = async () => {
@@ -24,8 +23,6 @@ export const useRetrieveTweetsByUser = (userAddress: string) => {
           setTweets(fetchedTweets);
         } catch (error) {
           console.error("Failed to fetch tweets:", error);
-        } finally {
-          setLoading(false);
         }
       } else {
         console.error("Ethereum provider not found.");
@@ -35,5 +32,5 @@ export const useRetrieveTweetsByUser = (userAddress: string) => {
     loadTweets();
   }, [userAddress]);
 
-  return { tweets, loading };
+  return { tweets };
 };
