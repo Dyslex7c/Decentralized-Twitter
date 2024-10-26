@@ -1,91 +1,127 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { IoIosReturnLeft } from "react-icons/io";
-import { useRetrieveTweetsByUser } from "../hooks/useRetrieveTweets";
-import { RootState } from "../store";
+import { useLocation, useParams } from "react-router-dom";
+import {
+  useRetrieveAllTweets,
+  useRetrieveTweetsByUser,
+} from "../hooks/useRetrieveTweets";
+import UserProfile from "../components/Layout/UserProfile";
 import UserPosts from "../components/Layout/UserPosts";
+import { RootState } from "../store";
+import { BigNumber } from "ethers";
+
+interface User {
+  id: string;
+  name: string;
+  address: string;
+  avatar: string;
+}
+
+type Tweet = {
+  date: number;
+  month: string;
+  id: string;
+  name: string;
+  author: string;
+  authorID: string;
+  content: string;
+  mediaCID: string;
+  timestamp: BigNumber;
+};
 
 const ProfilePage = () => {
-  const [activeComponent, setActiveComponent] = useState("posts");
-  
-  const navigate = useNavigate();
+  const [activeComponent, setActiveComponent] = useState<"posts" | "replies">(
+    "posts"
+  );
+  const [userAddress, setUserAddress] = useState<string | undefined | null>(
+    null
+  );
+  const [otherUser, setOtherUser] = useState<User | null>(null);
 
-  const user = useSelector((state: RootState) => state.user);
-  const userAddress = user?.address;
-  const userID = localStorage.getItem("userID");
+  const location = useLocation();
+  const { userID } = useParams<{ userID: string }>();
+
+  const currentUser = useSelector((state: RootState) => state.user);
+  const isCurrentUser = useMemo(
+    () => location.pathname === "/profile",
+    [location]
+  );
+
+  const { tweets: allTweets }: { tweets: Tweet[] } = useRetrieveAllTweets();
+
+  const selectedUser = useMemo(() => {
+    if (isCurrentUser) return currentUser;
+
+    const userTweet = allTweets.find(
+      (tweet: Tweet) => tweet.authorID === userID
+    );
+    if (!userTweet) return null;
+
+    return {
+      id: userTweet.authorID,
+      name: userTweet.name,
+      address: userTweet.author,
+      avatar: "https://cdn-icons-png.flaticon.com/128/10/10960.png",
+    };
+  }, [isCurrentUser, currentUser, allTweets, userID]);
+
+  useEffect(() => {
+    if (isCurrentUser) {
+      setUserAddress(currentUser?.address || null);
+    } else if (selectedUser) {
+      setUserAddress(selectedUser.address);
+      setOtherUser(selectedUser as User);
+    }
+  }, [isCurrentUser, currentUser, selectedUser]);
+
+  const requestEthereumAccount = useCallback(() => {
+    if (!userAddress && window.ethereum?.request) {
+      window.ethereum
+        .request({ method: "eth_requestAccounts" })
+        .then(([address]: string[]) => setUserAddress(address))
+        .catch((error) => console.error("Ethereum request error:", error));
+    }
+  }, [userAddress]);
+
+  useEffect(() => {
+    requestEthereumAccount();
+  }, [requestEthereumAccount]);
 
   const { tweets } = useRetrieveTweetsByUser(userAddress || "");
 
   return (
     <>
-      <div className="fixed w-full bg-black/[.5] z-40 flex flex-row items-center p-4">
-        <IoIosReturnLeft onClick={() => navigate("/home")} className="text-2xl mr-4 cursor-pointer" />
-        <div>
-          <p className="text-xl font-semibold" style={{ fontFamily: "Roboto" }}>
-            {user?.name}
-          </p>
-          <p className="text-sm text-gray-500">{tweets.length} post(s)</p>
-        </div>
-      </div>
-
-      <div className="relative mt-20">
-        <div className="w-full h-48 bg-gray-800"></div>
-        <div className="absolute top-32 left-5 flex flex-col items-center">
-          <img
-            src={user?.avatar}
-            alt="profile"
-            height={120}
-            width={120}
-            className="bg-white rounded-full"
-          />
-          <p
-            className="mt-4 text-2xl font-bold"
-            style={{ fontFamily: "Roboto" }}
-          >
-            {user?.name}
-          </p>
-          <p className="text-sm text-gray-500" style={{ fontFamily: "Roboto" }}>
-            @{userID}
-          </p>
-        </div>
-      </div>
-
-      <div className="h-48"></div>
+      <UserProfile
+        tweetCount={tweets.length}
+        user={isCurrentUser ? currentUser : otherUser}
+      />
 
       <div className="flex justify-evenly text-gray-400 sticky top-0 bg-black z-10">
-        <button onClick={() => setActiveComponent("posts")} className="w-1/2">
-          <div
-            className={`p-4 text-center hover:border-white transition duration-300 ${
-              activeComponent === "posts"
-                ? "text-white font-bold border-b-2 border-blue-600"
-                : "border-b border-gray-700"
-            }`}
-            style={{ fontFamily: "Prompt" }}
+        {["posts", "replies"].map((component) => (
+          <button
+            key={component}
+            onClick={() => setActiveComponent(component as "posts" | "replies")}
+            className="w-1/2"
           >
-            Posts
-          </div>
-        </button>
-        <button onClick={() => setActiveComponent("replies")} className="w-1/2">
-          <div
-            className={`p-4 text-center hover:border-white transition duration-300 ${
-              activeComponent === "replies"
-                ? "text-white font-bold border-b-2 border-blue-600"
-                : "border-b border-gray-700"
-            }`}
-            style={{ fontFamily: "Prompt" }}
-          >
-            Replies
-          </div>
-        </button>
+            <div
+              className={`p-4 text-center transition duration-300 ${
+                activeComponent === component
+                  ? "text-white font-bold border-b-2 border-blue-600"
+                  : "border-b border-gray-700 hover:border-white"
+              }`}
+            >
+              {component.charAt(0).toUpperCase() + component.slice(1)}
+            </div>
+          </button>
+        ))}
       </div>
 
       {activeComponent === "posts" && (
         <UserPosts
           tweets={tweets}
-          userAvatar={user?.avatar}
-          userName={user?.name}
-          userID={userID}
+          userAvatar={isCurrentUser ? currentUser?.avatar : otherUser?.avatar}
+          userName={isCurrentUser ? currentUser?.name : otherUser?.name}
+          userID={localStorage.getItem("userID") || ""}
         />
       )}
     </>

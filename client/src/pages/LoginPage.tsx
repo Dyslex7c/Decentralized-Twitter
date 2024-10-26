@@ -10,7 +10,7 @@ import { useAuth } from "../hooks/useAuth";
 
 const LoginPage = () => {
   const { handleGoogleAuth, connectWallet } = useAuth();
-
+  localStorage.setItem("userID", "");
   const [registerModal, setRegisterModal] = useState(false);
   const [loginModal, setLoginModal] = useState(false);
 

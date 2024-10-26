@@ -5,11 +5,13 @@ import HomePage from "./pages/HomePage";
 import LeftSideBar from "./components/Sidebar/LeftSideBar";
 import ExplorePage from "./pages/ExplorePage";
 import ProfilePage from "./pages/ProfilePage";
+// import { useSelector } from "react-redux";
+// import { RootState } from "./store";
 
 const AppLayout = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
-
+  //const user = useSelector((state: RootState) => state.user);
   return (
     <div className="flex">
       {!isLoginPage && <LeftSideBar />}
@@ -19,6 +21,7 @@ const AppLayout = () => {
           <Route path="/home" element={<HomePage />} />
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/:userID" element={<ProfilePage />} />
         </Routes>
       </div>
     </div>

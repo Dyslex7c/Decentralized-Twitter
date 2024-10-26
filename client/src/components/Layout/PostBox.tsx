@@ -32,7 +32,7 @@ const PostBox = () => {
 
   const [mediaCID, setMediaCID] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user);
-
+  const userID = localStorage.getItem("userID");
   const { contract } = useTweetContract();
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -109,7 +109,12 @@ const PostBox = () => {
   const postTweet = async () => {
     if (contract) {
       try {
-        const transaction = await contract.postTweet(text, mediaCID || "");
+        const transaction = await contract.postTweet(
+          user?.name,
+          userID,
+          text,
+          mediaCID || ""
+        );
         await transaction.wait();
         toast.success("Tweet posted successfully!");
         setText("");
@@ -124,7 +129,7 @@ const PostBox = () => {
   };
 
   return (
-    <div className="flex flex-col relative">
+    <div className="flex flex-col relative px-6 pb-6 border-b border-gray-700">
       <ToastContainer />
       <div className="absolute top-2 right-4">
         <select

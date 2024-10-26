@@ -11,7 +11,9 @@ export const useRetrieveTweetsByUser = (userAddress: string) => {
     const loadTweets = async () => {
       if (window.ethereum) {
         try {
-          const ethProvider = new ethers.providers.Web3Provider(window.ethereum);
+          const ethProvider = new ethers.providers.Web3Provider(
+            window.ethereum
+          );
           const signer = ethProvider.getSigner();
           const tweetContract = new ethers.Contract(
             CONTRACT_ADDRESS,
@@ -19,7 +21,9 @@ export const useRetrieveTweetsByUser = (userAddress: string) => {
             signer
           );
 
-          const fetchedTweets = await tweetContract.getTweetsByUser(userAddress);
+          const fetchedTweets = await tweetContract.getTweetsByUser(
+            userAddress
+          );
           setTweets(fetchedTweets);
         } catch (error) {
           console.error("Failed to fetch tweets:", error);
@@ -31,6 +35,38 @@ export const useRetrieveTweetsByUser = (userAddress: string) => {
 
     loadTweets();
   }, [userAddress]);
+
+  return { tweets };
+};
+
+export const useRetrieveAllTweets = () => {
+  const [tweets, setTweets] = useState([]);
+  useEffect(() => {
+    const loadTweets = async () => {
+      if (window.ethereum) {
+        try {
+          const ethProvider = new ethers.providers.Web3Provider(
+            window.ethereum
+          );
+          const signer = ethProvider.getSigner();
+          const tweetContract = new ethers.Contract(
+            CONTRACT_ADDRESS,
+            PostTweetABI.abi,
+            signer
+          );
+
+          const fetchedTweets = await tweetContract.getAllTweets();
+          setTweets(fetchedTweets);
+        } catch (error) {
+          console.error("Failed to fetch tweets:", error);
+        }
+      } else {
+        console.error("Ethereum provider not found.");
+      }
+    };
+
+    loadTweets();
+  }, []);
 
   return { tweets };
 };

@@ -1,18 +1,26 @@
-import React from "react";
 import PostBox from "./PostBox";
+import { useRetrieveAllTweets } from "../../hooks/useRetrieveTweets";
+import UserPosts from "./UserPosts";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
-import { useRetrieveTweetsByUser } from "../../hooks/useRetrieveTweets";
 
 const ForYouContent = () => {
   const user = useSelector((state: RootState) => state.user);
-  const userAddress = user?.address;
-  const { tweets } = useRetrieveTweetsByUser(userAddress || "");
+  const userID = localStorage.getItem("userID");
+  const { tweets } = useRetrieveAllTweets();
   console.log(tweets);
 
   return (
-    <div>
-      <PostBox />
+    <div className="">
+      <div className="">
+        <PostBox />
+      </div>
+      <UserPosts
+        tweets={tweets}
+        userAvatar={user?.avatar}
+        userID={userID}
+        userName={user?.name}
+      />
     </div>
   );
 };

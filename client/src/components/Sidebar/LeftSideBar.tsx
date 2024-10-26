@@ -13,6 +13,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { v5 as uuidv5 } from "uuid";
+import UsernameModal from "../UsernameModal";
 
 const bannerItems = [
   { name: "Home", icon: <IoIosHome />, route: "/home" },
@@ -33,6 +34,14 @@ const LeftSideBar = () => {
   const location = useLocation();
   const [activePage, setActivePage] = useState("Home");
   const user = useSelector((state: RootState) => state.user);
+  const usernameID = localStorage.getItem("userID");
+
+  const [userNameModal, setUserNameModal] = useState(true);
+
+  const toggleUserNameModal = () => {
+    setUserNameModal(!userNameModal);
+  };
+
   const address = user?.address;
 
   const NAMESPACE = process.env.REACT_APP_UUID_NAMESPACE;
@@ -50,6 +59,17 @@ const LeftSideBar = () => {
 
   const generateUserID = (address: any) => {
     if (!NAMESPACE) return;
+    if (!address && !usernameID) {
+      return (
+        <>
+          <UsernameModal
+            isVisible={userNameModal}
+            toggleUsernameModal={toggleUserNameModal}
+          />
+        </>
+      );
+    }
+    if (usernameID) return;
     const uuid = uuidv5(address, NAMESPACE);
     const userID = `user_${uuid.slice(0, 8)}`;
     localStorage.setItem("userID", userID);
@@ -59,7 +79,7 @@ const LeftSideBar = () => {
   return (
     <div className="flex flex-col fixed border-r h-screen flex-shrink-0 w-80 border-gray-700">
       <div
-        className="flex flex-col p-4 pl-12 gap-y-4"
+        className="flex flex-col p-4 pl-12 gap-y-2"
         style={{ fontFamily: "Roboto", fontWeight: 300 }}
       >
         <div className="mb-2">
@@ -81,7 +101,7 @@ const LeftSideBar = () => {
 
         <button
           className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition 
-            duration-300 ease-in-out text-white p-3 px-16 mb-20 mr-5 rounded-full flex 
+            duration-300 ease-in-out text-white p-3 px-16 mb-12 mr-5 rounded-full flex 
             items-center justify-center gap-2"
           style={{ fontWeight: 600 }}
         >
@@ -98,10 +118,12 @@ const LeftSideBar = () => {
           />
           <div className="flex flex-col text-sm">
             <p className="font-bold">{user?.name}</p>
-            <p className="text-gray-500">@{generateUserID(address)}</p>
+            <p className="text-gray-500">
+              @{generateUserID(address) || usernameID}
+            </p>
           </div>
           <div>
-            <IoIosMore className="text-2xl ml-20" />
+            <IoIosMore className="text-2xl ml-16" />
           </div>
         </div>
       </div>

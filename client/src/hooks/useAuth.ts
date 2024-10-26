@@ -11,22 +11,22 @@ import { useDispatch } from "react-redux";
 import { setUser } from "../state";
 
 declare global {
-    interface Window {
-      ethereum: ExternalProvider;
-    }
+  interface Window {
+    ethereum: ExternalProvider;
   }
-  
-  const METAMASK_BACKEND_URL = "http://localhost:3001/metamask";
-  const CLIENT_URL = "http://localhost:3000";
+}
+
+const METAMASK_BACKEND_URL = "http://localhost:3001/metamask";
+const CLIENT_URL = "http://localhost:3000";
 
 export const useAuth = () => {
-    const [address, setAddress] = useState("");
+  const [address, setAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   console.log(isWalletConnected);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-const handleGoogleAuth = async () => {
+  const handleGoogleAuth = async () => {
     const provider = await new GoogleAuthProvider();
     provider.setCustomParameters({
       theme: "dark",
@@ -44,7 +44,9 @@ const handleGoogleAuth = async () => {
           setUser({
             user: {
               name: user.displayName || "User",
-              avatar: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
+              avatar:
+                user.photoURL ||
+                "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
             },
             token: token,
           })
@@ -184,4 +186,4 @@ const handleGoogleAuth = async () => {
   };
 
   return { handleGoogleAuth, connectWallet };
-}
+};

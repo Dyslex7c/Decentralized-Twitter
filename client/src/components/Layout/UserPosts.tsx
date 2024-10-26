@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdOutlineModeComment } from "react-icons/md";
 import { BiBookmark, BiLike, BiRepost } from "react-icons/bi";
 import { SiGoogleanalytics } from "react-icons/si";
+import { BigNumber } from "ethers";
+import { useNavigate } from "react-router-dom";
 
 type Tweet = {
+  date: number;
+  month: string;
   id: string;
+  name: string;
   author: string;
+  authorID: string;
   content: string;
   mediaCID: string;
+  timestamp: BigNumber;
 };
 
 type UserPostsProps = {
@@ -36,9 +43,29 @@ const UserPosts = ({
     label: string;
   } | null>(null);
 
+  const navigate = useNavigate();
+  const [updatedTweets, setUpdatedTweets] = useState<Tweet[]>([]);
+  console.log(updatedTweets);
+
+  useEffect(() => {
+    const updatedTweets = tweets.map((tweet) => {
+      const timestamp = BigNumber.from(tweet.timestamp._hex).toNumber();
+      const date = new Date(timestamp * 1000);
+      return {
+        ...tweet,
+        date: date.getDate(),
+        month: date.toLocaleDateString("default", {
+          month: "short",
+        }),
+      };
+    });
+
+    setUpdatedTweets(updatedTweets);
+  }, [tweets]);
+
   return (
     <>
-      {tweets.map((tweet) => (
+      {updatedTweets.map((tweet) => (
         <div key={tweet.id} className="border-b border-gray-700">
           <div className="flex flex-row m-4 max-w-4xl">
             <img
@@ -49,16 +76,28 @@ const UserPosts = ({
             <div className="flex flex-col ml-2">
               <div className="flex flex-row">
                 <p
-                  className="font-semibold mr-2"
+                  className="font-semibold mr-2 cursor-pointer"
                   style={{ fontFamily: "Roboto" }}
+                  onClick={() => {
+                    navigate(`/profile/${tweet.authorID}`);
+                  }}
                 >
-                  {userName}
+                  {tweet.name}
+                </p>
+                <p
+                  className="text-sm mr-2 text-gray-500 cursor-pointer"
+                  style={{ fontFamily: "Roboto" }}
+                  onClick={() => {
+                    navigate(`/profile/${tweet.authorID}`);
+                  }}
+                >
+                  @{tweet.authorID}
                 </p>
                 <p
                   className="text-sm text-gray-500"
                   style={{ fontFamily: "Roboto" }}
                 >
-                  @{userID}
+                  {tweet.date} {tweet.month}
                 </p>
               </div>
               <p>{tweet.content}</p>
