@@ -20,15 +20,13 @@ const icons = [
   { key: "schedule", icon: <MdOutlineSchedule />, tooltip: "Schedule Post" },
 ];
 
-const PINATA_API_KEY = "3b2e9485d3d6c51ec593";
-const PINATA_SECRET_API_KEY =
-  "55ae1f11787102239d47de16abfa3b4d85aeaff15907ba38b9f2892479fb56a8";
+const PINATA_API_KEY = process.env.REACT_APP_PINATA_API_KEY;
+const PINATA_SECRET_API_KEY = process.env.REACT_APP_PINATA_API_SECRET;
 
 const PostBox = () => {
   const [text, setText] = useState("");
   const [postType, setPostType] = useState("Mutable");
   const [previewMediaURL, setPreviewMediaURL] = useState<string | null>(null);
-  console.log(previewMediaURL);
 
   const [mediaCID, setMediaCID] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user);
@@ -112,6 +110,7 @@ const PostBox = () => {
         const transaction = await contract.postTweet(
           user?.name,
           userID,
+          user?.avatar,
           text,
           mediaCID || ""
         );
@@ -124,7 +123,7 @@ const PostBox = () => {
         console.error("Error posting tweet:", error);
       }
     } else {
-      alert("Contract is not available. Please connect your wallet.");
+      toast.error("Contract is not available. Please connect your wallet.");
     }
   };
 

@@ -45,6 +45,7 @@ const LeftSideBar = () => {
   const address = user?.address;
 
   const NAMESPACE = process.env.REACT_APP_UUID_NAMESPACE;
+  console.log(NAMESPACE);
 
   useEffect(() => {
     const currentPath = location.pathname;

@@ -7,6 +7,7 @@ contract PostTweet {
         string name;
         address author;
         string authorID;
+        string avatar;
         string content;
         string mediaCID;
         uint256 timestamp;
@@ -22,12 +23,13 @@ contract PostTweet {
         address indexed author,
         string authorID,
         string name,
+        string avatar,
         string content,
         string mediaCID,
         uint256 timestamp
     );
 
-    function postTweet(string memory _name, string memory _authorID, string memory _content, string memory _mediaCID) public {
+    function postTweet(string memory _name, string memory _authorID, string memory _avatar, string memory _content, string memory _mediaCID) public {
         require(bytes(_content).length > 0, "Tweet content cannot be empty");
 
         Tweet memory newTweet = Tweet({
@@ -35,6 +37,7 @@ contract PostTweet {
             name: _name,
             author: msg.sender,
             authorID: _authorID,
+            avatar: _avatar,
             content: _content,
             mediaCID: _mediaCID,
             timestamp: block.timestamp
@@ -48,6 +51,7 @@ contract PostTweet {
             msg.sender,
             _authorID,
             _name,
+            _avatar,
             _content,
             _mediaCID,
             block.timestamp

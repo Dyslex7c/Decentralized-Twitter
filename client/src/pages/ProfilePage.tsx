@@ -22,6 +22,7 @@ type Tweet = {
   month: string;
   id: string;
   name: string;
+  avatar: string;
   author: string;
   authorID: string;
   content: string;
@@ -61,7 +62,7 @@ const ProfilePage = () => {
       id: userTweet.authorID,
       name: userTweet.name,
       address: userTweet.author,
-      avatar: "https://cdn-icons-png.flaticon.com/128/10/10960.png",
+      avatar: userTweet.avatar,
     };
   }, [isCurrentUser, currentUser, allTweets, userID]);
 
@@ -119,9 +120,7 @@ const ProfilePage = () => {
       {activeComponent === "posts" && (
         <UserPosts
           tweets={tweets}
-          userAvatar={isCurrentUser ? currentUser?.avatar : otherUser?.avatar}
-          userName={isCurrentUser ? currentUser?.name : otherUser?.name}
-          userID={localStorage.getItem("userID") || ""}
+          isProfile={true}
         />
       )}
     </>

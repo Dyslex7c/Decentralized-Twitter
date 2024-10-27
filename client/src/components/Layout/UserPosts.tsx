@@ -3,13 +3,14 @@ import { MdOutlineModeComment } from "react-icons/md";
 import { BiBookmark, BiLike, BiRepost } from "react-icons/bi";
 import { SiGoogleanalytics } from "react-icons/si";
 import { BigNumber } from "ethers";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 type Tweet = {
   date: number;
   month: string;
   id: string;
   name: string;
+  avatar: string;
   author: string;
   authorID: string;
   content: string;
@@ -19,9 +20,7 @@ type Tweet = {
 
 type UserPostsProps = {
   tweets: Tweet[];
-  userAvatar: string | undefined;
-  userName: string | undefined;
-  userID: string | null;
+  isProfile: boolean;
 };
 
 const interactionIcons = [
@@ -34,9 +33,7 @@ const interactionIcons = [
 
 const UserPosts = ({
   tweets,
-  userAvatar,
-  userName,
-  userID,
+  isProfile,
 }: UserPostsProps) => {
   const [hoveredIcon, setHoveredIcon] = useState<{
     postId: string;
@@ -45,7 +42,8 @@ const UserPosts = ({
 
   const navigate = useNavigate();
   const [updatedTweets, setUpdatedTweets] = useState<Tweet[]>([]);
-  console.log(updatedTweets);
+
+  const { userID } = useParams<{ userID: string }>();
 
   useEffect(() => {
     const updatedTweets = tweets.map((tweet) => {
@@ -65,11 +63,14 @@ const UserPosts = ({
 
   return (
     <>
-      {updatedTweets.map((tweet) => (
+      {updatedTweets.map((tweet) => {if (isProfile && userID && userID !== tweet.authorID) {
+        return null;
+      }
+      return (
         <div key={tweet.id} className="border-b border-gray-700">
           <div className="flex flex-row m-4 max-w-4xl">
             <img
-              src={userAvatar}
+              src={tweet.avatar}
               alt="profile"
               className="w-10 h-10 rounded-full object-cover bg-white"
             />
@@ -106,12 +107,12 @@ const UserPosts = ({
                   <img
                     src={`https://gateway.pinata.cloud/ipfs/${tweet.mediaCID}`}
                     alt="postimg"
-                    width="60%"
+                    width={500}
                     className="rounded-xl"
                   />
                 </div>
               )}
-              <div className="mt-2 flex flex-row justify-between">
+              <div className="mt-2 flex flex-row max-w-60 justify-between">
                 {interactionIcons.map(({ icon, label }, index) => (
                   <div key={index} className="relative">
                     <button
@@ -139,7 +140,7 @@ const UserPosts = ({
             </div>
           </div>
         </div>
-      ))}
+      )})}
     </>
   );
 };
