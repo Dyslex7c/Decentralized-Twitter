@@ -4,6 +4,8 @@ A re-imagined version of the traditional social media platform - Twitter, but it
 
 ![alt text](client/src/assets/screenshot1.png)
 
+Development is still under progress ⚠️
+
 ## Key Features:
 
 Blockchain-Powered: Every tweet, like, or post is stored and verified using Ethereum smart contracts, so nobody can tamper with your data.
