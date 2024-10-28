@@ -1,4 +1,7 @@
 import { ChangeEvent, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "../state";
+import { useNavigate } from "react-router-dom";
 
 interface UserData {
   email: string;
@@ -16,6 +19,9 @@ const LoginModal = ({
     email: "",
     password: "",
   });
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleFieldChange =
     (field: keyof UserData) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -52,8 +58,19 @@ const LoginModal = ({
       const loggedInUser = await userResponse.json();
 
       console.log(loggedInUser);
+      dispatch(
+        setUser({
+          user: {
+            name:
+              `${loggedInUser.firstName} ${loggedInUser.lastName}` || "User",
+            avatar: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
+          },
+          token: loggedIn.access_token,
+        })
+      );
+      navigate("/home");
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
