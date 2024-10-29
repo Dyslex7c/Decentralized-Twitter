@@ -20,7 +20,6 @@ const METAMASK_BACKEND_URL = "http://localhost:3001/metamask";
 const CLIENT_URL = "http://localhost:3000";
 
 export const useAuth = () => {
-  const [address, setAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   console.log(isWalletConnected);
 
@@ -69,8 +68,8 @@ export const useAuth = () => {
           method: "eth_requestAccounts",
         });
         setIsWalletConnected(true);
-        setAddress(ethers.utils.getAddress(userAddress));
-        handleMetaMaskLogin();
+        const address = ethers.utils.getAddress(userAddress)
+        handleMetaMaskLogin(address);
       } else {
         toast.warn(
           "MetaMask is not installed. Please install MetaMask to sign-up successfully.",
@@ -92,7 +91,7 @@ export const useAuth = () => {
     }
   };
 
-  const getSiweMessage = async (): Promise<string | void> => {
+  const getSiweMessage = async (address: string): Promise<string | void> => {
     try {
       const response = await axios.post(
         `${METAMASK_BACKEND_URL}/message`,
@@ -138,6 +137,7 @@ export const useAuth = () => {
   };
 
   const verifySignature = async (
+    address: string,
     message: string,
     signature: string
   ): Promise<void> => {
@@ -169,9 +169,9 @@ export const useAuth = () => {
     }
   };
 
-  const handleMetaMaskLogin = async () => {
+  const handleMetaMaskLogin = async (address: string) => {
     try {
-      const message = await getSiweMessage();
+      const message = await getSiweMessage(address);
       if (!message) {
         throw new Error("Message generation failed");
       }
@@ -179,7 +179,7 @@ export const useAuth = () => {
       if (!signature) {
         throw new Error("Signature is required");
       }
-      await verifySignature(message, signature);
+      await verifySignature(address, message, signature);
     } catch (error) {
       console.error("Login failed:", error);
     }
