@@ -96,7 +96,6 @@ const ProfilePage = () => {
         tweetCount={tweets.length}
         user={isCurrentUser ? currentUser : otherUser}
       />
-
       <div className="flex justify-evenly text-gray-400 sticky top-0 bg-black z-10">
         {["posts", "replies"].map((component) => (
           <button
@@ -118,10 +117,7 @@ const ProfilePage = () => {
       </div>
 
       {activeComponent === "posts" && (
-        <UserPosts
-          tweets={tweets}
-          isProfile={true}
-        />
+        <UserPosts tweets={tweets} isProfile={true} />
       )}
     </>
   );

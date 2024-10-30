@@ -96,10 +96,10 @@ const LeftSideBar = () => {
   useEffect(() => {
     if (dropdownPopoverShow) {
       createPopper(btnDropdownRef.current!, popoverDropdownRef.current!, {
-        placement: "bottom-end",
+        placement: "top-end",
         modifiers: [
-          { name: "offset", options: { offset: [0, 8] } },
-          { name: "preventOverflow", options: { boundary: "window" } },
+          { name: "offset", options: { offset: [0, -10] } },
+          { name: "preventOverflow", options: { boundary: "viewport" } },
         ],
       });
     }
@@ -168,9 +168,9 @@ const LeftSideBar = () => {
           <div
             ref={popoverDropdownRef}
             className={`${
-              dropdownPopoverShow ? "block" : "hidden"
-            } absolute z-50 shadow-lg shadow-blue-500 rounded py-2 bg-black`}
-            style={{ minWidth: "12rem", top: "100%", right: 0 }}
+              dropdownPopoverShow ? "block animate-fade-in" : "hidden"
+            } absolute shadow-lg shadow-blue-500 rounded py-2 bg-black`}
+            style={{ minWidth: "12rem", top: "-20px", right: 0 }}
           >
             <button
               className="text-sm py-4 px-4 font-normal block w-full whitespace-nowrap hover:bg-gray-700 transition duration-300"

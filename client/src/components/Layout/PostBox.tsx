@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useTweetContract } from "../../hooks/useTweetContract";
+import axios from "axios";
 import {
   MdOutlineGif,
   MdOutlinePermMedia,
@@ -6,10 +9,7 @@ import {
   MdPoll,
 } from "react-icons/md";
 import { FaUserSecret } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { RootState } from "../../store";
-import axios from "axios";
-import { useTweetContract } from "../../hooks/useTweetContract";
 import { toast, ToastContainer } from "react-toastify";
 
 const icons = [
@@ -27,6 +27,7 @@ const PostBox = () => {
   const [text, setText] = useState("");
   const [postType, setPostType] = useState("Mutable");
   const [previewMediaURL, setPreviewMediaURL] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<"image" | "video" | null>(null);
 
   const [mediaCID, setMediaCID] = useState<string | null>(null);
   const user = useSelector((state: RootState) => state.user);
@@ -86,11 +87,16 @@ const PostBox = () => {
             },
           }
         );
+
         const url = `https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`;
+
+        const isVideo = file.type.startsWith("video");
+        setMediaType(isVideo ? "video" : "image");
         setPreviewMediaURL(url);
         setMediaCID(res.data.IpfsHash);
       } catch (err) {
         console.error(err);
+        toast.error("Failed to upload media.");
       }
     };
     input.click();
@@ -119,6 +125,7 @@ const PostBox = () => {
         setText("");
         setPreviewMediaURL(null);
         setMediaCID(null);
+        setMediaType(null);
       } catch (error) {
         console.error("Error posting tweet:", error);
       }
@@ -160,7 +167,11 @@ const PostBox = () => {
 
       {previewMediaURL && (
         <div className="flex justify-center mt-4">
-          <img src={previewMediaURL} alt="Preview" />
+          {mediaType === "video" ? (
+            <video src={previewMediaURL} controls className="w-full max-w-md" />
+          ) : (
+            <img src={previewMediaURL} alt="Preview" className="max-w-md" />
+          )}
         </div>
       )}
 
