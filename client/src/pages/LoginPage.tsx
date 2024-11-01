@@ -36,25 +36,25 @@ const LoginPage = () => {
           isVisible={loginModal}
         />
       )}
-      <div className="w-full h-screen flex flex-row p-2">
+      <div className="w-full h-screen flex flex-col md:flex-row p-2">
         <ToastContainer
           bodyClassName={() =>
             "text-sm text-black font-white font-med block p-3"
           }
         />
-        <div className="w-1/2 h-screen flex items-center justify-center">
-          <img src={logo} alt="logo" />
+        <div className="w-full md:w-1/2 h-1/3 md:h-screen flex items-center justify-center">
+          <img src={logo} alt="logo" className="w-3/4 md:w-auto" />
         </div>
-        <div className="w-1/2 h-screen flex items-center justify-center">
-          <div className="flex flex-col items-start">
+        <div className="w-full md:w-1/2 h-1/3 md:h-screen flex items-center justify-center">
+          <div className="flex flex-col items-start text-center md:text-left px-4 md:px-0">
             <div
-              className="text-7xl p-4 m-2"
+              className="text-3xl md:text-7xl p-4 m-2 mt-52 md:mt-0"
               style={{ fontFamily: "Bebas Neue" }}
             >
               Decentralize your voice
             </div>
             <div
-              className="text-3xl p-4 m-2"
+              className="text-xl md:text-3xl p-4 m-2"
               style={{ fontFamily: "Prompt", fontWeight: 600 }}
             >
               Get started today
@@ -62,7 +62,7 @@ const LoginPage = () => {
             <div className="flex flex-col px-4 m-2 gap-y-2">
               <button
                 onClick={handleGoogleAuth}
-                className="bg-white hover:bg-[#78c7ff] transtion duration-300 ease-in-out text-black p-3 px-16 rounded-full flex items-center gap-2"
+                className="bg-white hover:bg-[#78c7ff] transtion duration-300 ease-in-out text-black p-3 md:px-16 rounded-full flex items-center justify-center md:justify-start gap-2"
               >
                 <img src={googlelogo} width={20} alt="google" />
                 <span
@@ -74,7 +74,7 @@ const LoginPage = () => {
               </button>
               <button
                 onClick={connectWallet}
-                className="bg-white hover:bg-[#59ffa1] transtion duration-300 ease-in-out text-black p-3 px-16 mb-6 rounded-full flex items-center gap-2"
+                className="bg-white hover:bg-[#59ffa1] transtion duration-300 ease-in-out text-black p-3 md:px-16 mb-6 rounded-full flex items-center justify-center md:justify-start gap-2"
               >
                 <img src={metamasklogo} width={20} alt="metamask" />
                 <span
@@ -85,7 +85,7 @@ const LoginPage = () => {
                 </span>
               </button>
               <button
-                className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white p-3 px-16 rounded-full flex items-center justify-center gap-2"
+                className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white p-3 md:px-16 rounded-full flex items-center justify-center gap-2"
                 onClick={toggleRegisterModal}
               >
                 <span

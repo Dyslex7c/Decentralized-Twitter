@@ -135,9 +135,9 @@ const PostBox = () => {
   };
 
   return (
-    <div className="flex flex-col relative px-6 pb-6 border-b border-gray-700">
+    <div className="flex-col relative hidden sm:block sm:flex-row sm:items-center lg:px-6 lg:pb-6 border-b border-gray-700">
       <ToastContainer />
-      <div className="absolute top-2 right-4">
+      <div className="absolute top-2 right-4 sm:static px-2 sm:mr-4 lg:px-0">
         <select
           value={postType}
           onChange={(event) => setPostType(event.target.value)}
@@ -148,18 +148,18 @@ const PostBox = () => {
         </select>
       </div>
 
-      <div className="flex flex-row items-start border-b border-gray-700 p-3">
+      <div className="flex flex-col sm:flex-row items-start border-b border-gray-700 p-3">
         <img
           src={user?.avatar}
           alt="user"
           width={40}
           height={40}
-          className="rounded-full bg-white"
+          className="rounded-full bg-white mb-2 sm:mb:0"
         />
         <textarea
           placeholder="What's your Proof of Activity?"
-          className="bg-black text-xl ml-1 w-96 resize-none placeholder-gray-500 p-2 overflow-hidden focus:outline-none"
-          style={{ height: "48px", paddingTop: "10px" }}
+          className="bg-black text-xl ml-1 w-full h-20 md:h-12 resize-none placeholder-gray-500 p-2 overflow-hidden focus:outline-none sm:ml-2"
+          style={{ paddingTop: "10px" }}
           value={text}
           onChange={handleInput}
         />
@@ -175,7 +175,7 @@ const PostBox = () => {
         </div>
       )}
 
-      <div className="flex flex-row justify-between items-center mt-4 ml-16 gap-2">
+      <div className="flex flex-row justify-between items-center sm:mt-4 ml-16 gap-2">
         <div className="flex flex-row gap-2">
           {icons.map((item) => (
             <span
@@ -193,8 +193,8 @@ const PostBox = () => {
         <button
           onClick={postTweet}
           className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition 
-            duration-300 ease-in-out text-white p-3 px-16 rounded-full flex 
-            items-center justify-center gap-2"
+            duration-300 ease-in-out text-white p-3 w-full sm:w-auto px-8 lg:px-16 rounded-full flex 
+            items-center justify-center gap-2 mb-4 lg:m-0"
           style={{ fontFamily: "Roboto", fontWeight: 600 }}
         >
           Post

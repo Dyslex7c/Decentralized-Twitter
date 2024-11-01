@@ -15,7 +15,7 @@ const AppLayout = () => {
   return (
     <div className="flex">
       {!isLoginPage && <LeftSideBar />}
-      <div className={`flex-grow ${!isLoginPage ? "ml-80" : ""}`}>
+      <div className={`flex-grow ${!isLoginPage ? "ml-20 lg:ml-80" : ""}`}>
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/home" element={<HomePage />} />

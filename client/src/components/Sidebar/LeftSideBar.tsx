@@ -110,9 +110,9 @@ const LeftSideBar = () => {
   }, [dropdownPopoverShow]);
 
   return (
-    <div className="flex flex-col fixed border-r h-screen flex-shrink-0 w-80 border-gray-700">
+    <div className="flex flex-col fixed border-r h-screen flex-shrink-0 w-20 lg:w-80 border-gray-700">
       <div
-        className="flex flex-col p-4 pl-12 gap-y-2"
+        className="flex flex-col p-3 lg:p-4 lg:pl-12 gap-y-2"
         style={{ fontFamily: "Roboto", fontWeight: 300 }}
       >
         <div className="mb-2">
@@ -131,18 +131,18 @@ const LeftSideBar = () => {
             } p-2 rounded`}
           >
             <span className="text-4xl">{icon}</span>
-            {name}
+            <span className="hidden lg:block">{name}</span>
           </button>
         ))}
 
         <button
-          className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white p-3 px-16 mb-12 mr-5 rounded-full flex items-center justify-center gap-2"
+          className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white ml-1 p-3 px-6 lg:px-16 mb-12 mr-5 rounded-full flex items-center justify-center gap-2"
           style={{ fontWeight: 600 }}
         >
           Post
         </button>
 
-        <div className="relative flex items-center">
+        <div className="relative flex items-center p-2">
           <img
             src={user?.avatar}
             alt="avatar"
@@ -150,7 +150,7 @@ const LeftSideBar = () => {
             width={40}
             className="rounded-full mr-5 bg-white"
           />
-          <div className="flex flex-col text-sm">
+          <div className="hidden lg:block flex-col text-sm">
             <p className="font-bold">{user?.name}</p>
             <p className="text-gray-500">
               @{generateUserID(address) || usernameID}
@@ -160,7 +160,7 @@ const LeftSideBar = () => {
           <button
             ref={btnDropdownRef}
             onClick={toggleDropdown}
-            className="relative"
+            className="relative hidden lg:block"
           >
             <IoIosMore className="text-2xl ml-16" />
           </button>

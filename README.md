@@ -60,7 +60,7 @@ npx hardhat node
 Deploy your contract
 
 ```
-npx hardhat run scripts/deployTweetContract.ts
+make deploy
 ```
 
 Finally, run `npm start` and you're good to go.
