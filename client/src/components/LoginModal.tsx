@@ -82,7 +82,7 @@ const LoginModal = ({
     <div
       className={`${
         isVisible ? "animate-fade-in" : "hidden"
-      } fixed inset-0 z-50 top-28 left-1/3 justify-center items-center`}
+      } fixed inset-0 z-50 flex justify-center items-center`}
     >
       <div
         className={`relative bg-black shadow-2xl shadow-blue-500 p-4 md:p-7 max-w-lg min-w-[300px] leading-relaxed transition-all duration-300 ease-in-out transform ${
@@ -110,7 +110,7 @@ const LoginModal = ({
         >
           Sign in Now
         </h1>
-        <div className="flex flex-col gap-y-5 pb-8">
+        <div className="flex flex-row gap-x-5 pb-8">
           <input
             type="email"
             className="bg-black p-2 border border-gray-700 shadow-sm shadow-gray-500"
