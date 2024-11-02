@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import LeftSideBar from "./components/Sidebar/LeftSideBar";
 import ExplorePage from "./pages/ExplorePage";
 import ProfilePage from "./pages/ProfilePage";
+import TweetThread from "./components/Layout/TweetThread";
 // import { useSelector } from "react-redux";
 // import { RootState } from "./store";
 
@@ -22,6 +23,7 @@ const AppLayout = () => {
           <Route path="/explore" element={<ExplorePage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:userID" element={<ProfilePage />} />
+          <Route path="/:userID/status/:id" element={<TweetThread />} />
         </Routes>
       </div>
     </div>

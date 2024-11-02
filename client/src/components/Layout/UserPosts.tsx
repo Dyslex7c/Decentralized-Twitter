@@ -102,7 +102,7 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                     {tweet.date} {tweet.month}
                   </p>
                 </div>
-                <p>{tweet.content}</p>
+                <p className="cursor-pointer" onClick={() => navigate(`/${tweet.authorID}/status/${tweet.id}`, { state: { tweet } })}>{tweet.content}</p>
 
                 {mediaElements[tweet.id] !== undefined ? (
                   mediaElements[tweet.id]
