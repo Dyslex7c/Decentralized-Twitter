@@ -8,6 +8,7 @@ import ReactLoading from "react-loading";
 import { usePostInteractions } from "../../hooks/usePostInteractions";
 import useFetchMedia from "../../hooks/useFetchMedia";
 import useLikeStatus from "../../hooks/useLikeStatus";
+import CommentModal from "../Overlay/CommentModal";
 
 type Tweet = {
   date: number;
@@ -27,24 +28,23 @@ type UserPostsProps = {
   isProfile: boolean;
 };
 
-const interactionIcons = [
-  { icon: <MdOutlineModeComment />, label: "Comment" },
-  { icon: <BiRepost />, label: "Repost" },
-  { icon: <BiLike />, iconActivated: <BiSolidLike />, label: "Like" },
-  { icon: <SiGoogleanalytics />, label: "Analytics" },
-  { icon: <BiBookmark />, label: "Bookmark" },
-];
-
 const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
   const [hoveredIcon, setHoveredIcon] = useState<{
     postId: string;
     label: string;
   } | null>(null);
+
+  const [activatedTweet, setActivatedTweet] = useState<Tweet>();
   const navigate = useNavigate();
   const { userID } = useParams<{ userID: string }>();
   const [updatedTweets, setUpdatedTweets] = useState<Tweet[]>([]);
   const { contract } = usePostInteractions();
   const { mediaElements } = useFetchMedia(tweets);
+  const [commentModal, setCommentModal] = useState(false);
+
+  const toggleCommentModal = () => {
+    setCommentModal(!commentModal);
+  };
 
   useEffect(() => {
     const mappedTweets = tweets.map((tweet) => {
@@ -64,8 +64,79 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
     contract
   );
 
+  const handleComment = (tweet: Tweet) => {
+    setActivatedTweet(tweet);
+    setCommentModal(true);
+    console.log(`Comment on tweet: ${tweet.id}`);
+  };
+
+  const handleRepost = (tweet: Tweet) => {
+    console.log(`Repost tweet: ${tweet.id}`);
+  };
+
+  const handleLike = (tweet: Tweet) => {
+    likedTweets[tweet.id]
+      ? unlikeTweet(tweet.id, tweet.author)
+      : likeTweet(tweet.id, tweet.author);
+  };
+
+  const handleAnalytics = (tweet: Tweet) => {
+    console.log(`Show analytics for tweet: ${tweet.id}`);
+  };
+
+  const handleBookmark = (tweet: Tweet) => {
+    console.log(`Bookmark tweet: ${tweet.id}`);
+  };
+
+  const interactionIcons = [
+    {
+      icon: <MdOutlineModeComment />,
+      label: "Comment",
+      color: "text-blue-400",
+      hoverColor: "hover:text-blue-400",
+      action: handleComment,
+    },
+    {
+      icon: <BiRepost />,
+      label: "Repost",
+      color: "text-green-400",
+      hoverColor: "hover:text-green-400",
+      action: handleRepost,
+    },
+    {
+      icon: <BiLike />,
+      iconActivated: <BiSolidLike />,
+      label: "Like",
+      color: "text-rose-400",
+      hoverColor: "hover:text-rose-400",
+      action: handleLike,
+    },
+    {
+      icon: <SiGoogleanalytics />,
+      label: "Analytics",
+      color: "text-blue-400",
+      hoverColor: "hover:text-blue-400",
+      action: handleAnalytics,
+    },
+    {
+      icon: <BiBookmark />,
+      label: "Bookmark",
+      color: "text-blue-400",
+      hoverColor: "hover:text-blue-400",
+      action: handleBookmark,
+    },
+  ];
+
   return (
     <>
+      {commentModal && (
+        <CommentModal
+          isVisible={commentModal}
+          toggleCommentModal={toggleCommentModal}
+          tweet={activatedTweet}
+        />
+      )}
+
       {updatedTweets.map((tweet) => {
         if (isProfile && userID && userID !== tweet.authorID) {
           return null;
@@ -102,7 +173,16 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                     {tweet.date} {tweet.month}
                   </p>
                 </div>
-                <p className="cursor-pointer" onClick={() => navigate(`/${tweet.authorID}/status/${tweet.id}`, { state: { tweet } })}>{tweet.content}</p>
+                <p
+                  className="cursor-pointer"
+                  onClick={() =>
+                    navigate(`/${tweet.authorID}/status/${tweet.id}`, {
+                      state: { tweet },
+                    })
+                  }
+                >
+                  {tweet.content}
+                </p>
 
                 {mediaElements[tweet.id] !== undefined ? (
                   mediaElements[tweet.id]
@@ -117,23 +197,22 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
 
                 <div className="mt-2 flex flex-row max-w-60 justify-between">
                   {interactionIcons.map(
-                    ({ icon, iconActivated, label }, index) => (
+                    (
+                      { icon, iconActivated, label, color, hoverColor, action },
+                      index
+                    ) => (
                       <div key={index} className="relative">
                         <button
-                          onClick={() =>
-                            likedTweets[tweet.id]
-                              ? unlikeTweet(tweet.id, tweet.author)
-                              : likeTweet(tweet.id, tweet.author)
-                          }
+                          onClick={() => action(tweet)}
                           onMouseEnter={() =>
                             setHoveredIcon({ postId: tweet.id, label })
                           }
                           onMouseLeave={() => setHoveredIcon(null)}
                           className={`${
                             likedTweets[tweet.id] && label === "Like"
-                              ? "text-green-400"
+                              ? color
                               : "text-gray-400"
-                          } hover:text-green-400 hover:bg-gray-800 transition text-xl p-2 rounded-full flex items-center space-x-1`}
+                          } ${hoverColor} hover:bg-gray-800 transition text-xl p-2 rounded-full flex items-center space-x-1`}
                         >
                           {likedTweets[tweet.id] && label === "Like"
                             ? iconActivated
@@ -144,7 +223,7 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                             </span>
                           )}
                           <div
-                            className={`absolute top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 ease-in-out ${
+                            className={`absolute top-10 left-1/3 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 ease-in-out ${
                               hoveredIcon?.postId === tweet.id &&
                               hoveredIcon.label === label
                                 ? "opacity-100"

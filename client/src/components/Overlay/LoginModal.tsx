@@ -1,6 +1,6 @@
 import { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
-import { setUser } from "../state";
+import { setUser } from "../../state";
 import { useNavigate } from "react-router-dom";
 
 interface UserData {

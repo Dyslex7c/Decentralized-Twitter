@@ -16,7 +16,7 @@ import { createPopper } from "@popperjs/core";
 import { FaPlus } from "react-icons/fa";
 import { clearUser } from "../../state";
 import { RootState } from "../../store";
-import UsernameModal from "../UsernameModal";
+import UsernameModal from "../Overlay/UsernameModal";
 
 const bannerItems = [
   { name: "Home", icon: <IoIosHome />, route: "/home" },

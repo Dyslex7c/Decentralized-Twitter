@@ -18,7 +18,9 @@ type MediaElements = {
   [key: string]: JSX.Element | null;
 };
 
-const useFetchMedia = (tweets: Tweet[]): { mediaElements: MediaElements } => {
+const useFetchMedia = (
+  tweets: Tweet[] | []
+): { mediaElements: MediaElements } => {
   const [mediaElements, setMediaElements] = useState<MediaElements>({});
 
   const fetchMedia = useCallback(async () => {

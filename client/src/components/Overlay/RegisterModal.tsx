@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setUser } from "../state";
+import { setUser } from "../../state";
 
 interface UserData {
   firstName: string;
