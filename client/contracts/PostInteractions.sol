@@ -138,4 +138,24 @@ contract PostInteractions {
     ) external view returns (Comment[] memory) {
         return comments[author][tweetId];
     }
+
+    function getTotalComments(
+        address author,
+        uint256 tweetId
+    ) external view returns (uint256) {
+        return comments[author][tweetId].length;
+    }
+
+    function hasUserCommented(
+        address author,
+        uint256 tweetId
+    ) external view returns (bool) {
+        Comment[] memory tweetComments = comments[author][tweetId];
+        for (uint256 i = 0; i < tweetComments.length; i++) {
+            if (tweetComments[i].author == msg.sender) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

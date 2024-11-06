@@ -7,7 +7,7 @@ async function deployPostInteractions() {
 
   await postInteractions.deployed();
 
-  console.log(`PostTweet deployed to: ${postInteractions.address}`);
+  console.log(`PostInteractions deployed to: ${postInteractions.address}`);
 }
 
 deployPostInteractions()
