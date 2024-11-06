@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { MdModeComment, MdOutlineModeComment } from "react-icons/md";
-import { BiBookmark, BiLike, BiRepost, BiSolidLike } from "react-icons/bi";
-import { SiGoogleanalytics } from "react-icons/si";
 import { BigNumber } from "ethers";
 import ReactLoading from "react-loading";
 import { usePostInteractions } from "../../hooks/usePostInteractions";
@@ -10,19 +7,8 @@ import useFetchMedia from "../../hooks/useFetchMedia";
 import useLikeStatus from "../../hooks/useLikeStatus";
 import useCommentHandler from "../../hooks/useCommentHandler";
 import CommentModal from "../Overlay/CommentModal";
-
-type Tweet = {
-  date: number;
-  month: string;
-  id: string;
-  name: string;
-  avatar: string;
-  author: string;
-  authorID: string;
-  content: string;
-  mediaCID: string;
-  timestamp: BigNumber;
-};
+import { createInteractionIcons } from "../../utils/InteractionIcons";
+import { Tweet } from "../../types";
 
 type UserPostsProps = {
   tweets: Tweet[];
@@ -65,7 +51,10 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
     contract
   );
 
-  const { totalComments, hasUserCommented } = useCommentHandler(tweets, contract);
+  const { totalComments, hasUserCommented } = useCommentHandler(
+    tweets,
+    contract
+  );
 
   const handleComment = (tweet: Tweet) => {
     setActivatedTweet(tweet);
@@ -91,45 +80,13 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
     console.log(`Bookmark tweet: ${tweet.id}`);
   };
 
-  const interactionIcons = [
-    {
-      icon: <MdOutlineModeComment />,
-      iconActivated: <MdModeComment />,
-      label: "Comment",
-      color: "text-blue-400",
-      hoverColor: "hover:text-blue-400",
-      action: handleComment,
-    },
-    {
-      icon: <BiRepost />,
-      label: "Repost",
-      color: "text-green-400",
-      hoverColor: "hover:text-green-400",
-      action: handleRepost,
-    },
-    {
-      icon: <BiLike />,
-      iconActivated: <BiSolidLike />,
-      label: "Like",
-      color: "text-rose-400",
-      hoverColor: "hover:text-rose-400",
-      action: handleLike,
-    },
-    {
-      icon: <SiGoogleanalytics />,
-      label: "Analytics",
-      color: "text-blue-400",
-      hoverColor: "hover:text-blue-400",
-      action: handleAnalytics,
-    },
-    {
-      icon: <BiBookmark />,
-      label: "Bookmark",
-      color: "text-blue-400",
-      hoverColor: "hover:text-blue-400",
-      action: handleBookmark,
-    },
-  ];
+  const interactionIcons = createInteractionIcons(
+    handleComment,
+    handleRepost,
+    handleLike,
+    handleAnalytics,
+    handleBookmark
+  );
 
   return (
     <>
@@ -209,7 +166,10 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
 
                       if (label === "Like" && likedTweets[tweet.id]) {
                         isActivated = true;
-                      } else if (label === "Comment" && hasUserCommented[tweet.id]) {
+                      } else if (
+                        label === "Comment" &&
+                        hasUserCommented[tweet.id]
+                      ) {
                         isActivated = true;
                       }
 

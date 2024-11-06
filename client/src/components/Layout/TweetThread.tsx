@@ -5,46 +5,32 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import useFetchMedia from "../../hooks/useFetchMedia";
 import { BigNumber } from "ethers";
-import { MdOutlineModeComment } from "react-icons/md";
-import { BiBookmark, BiLike, BiRepost, BiSolidLike } from "react-icons/bi";
-import { SiGoogleanalytics } from "react-icons/si";
 import useLikeStatus from "../../hooks/useLikeStatus";
 import { usePostInteractions } from "../../hooks/usePostInteractions";
 import { useRetrieveComments } from "../../hooks/useRetrieveComments";
 import UserPosts from "./UserPosts";
-
-interface Tweet {
-  date: number;
-  month: string;
-  id: string;
-  name: string;
-  avatar: string;
-  author: string;
-  authorID: string;
-  content: string;
-  mediaCID: string;
-  timestamp: BigNumber;
-}
-
-const interactionIcons = [
-  { icon: <MdOutlineModeComment />, label: "Comment" },
-  { icon: <BiRepost />, label: "Repost" },
-  { icon: <BiLike />, iconActivated: <BiSolidLike />, label: "Like" },
-  { icon: <SiGoogleanalytics />, label: "Analytics" },
-  { icon: <BiBookmark />, label: "Bookmark" },
-];
+import { Tweet } from "../../types";
+import { createInteractionIcons } from "../../utils/InteractionIcons";
+import CommentModal from "../Overlay/CommentModal";
+import useCommentHandler from "../../hooks/useCommentHandler";
 
 const TweetThread = () => {
   const [hoveredIcon, setHoveredIcon] = useState<{
     postId: string;
     label: string;
   } | null>(null);
+  const [activatedTweet, setActivatedTweet] = useState<Tweet>();
   const navigate = useNavigate();
   const location = useLocation();
   const tweet = location.state?.tweet as Tweet | undefined;
   const [formattedDateTime, setFormattedDateTime] = useState<string | null>(
     null
   );
+  const [commentModal, setCommentModal] = useState(false);
+
+  const toggleCommentModal = () => {
+    setCommentModal(!commentModal);
+  };
 
   const { contract } = usePostInteractions();
 
@@ -87,12 +73,56 @@ const TweetThread = () => {
     contract
   );
 
+  const { totalComments, hasUserCommented } = useCommentHandler(
+    tweet ? [tweet] : [],
+    contract
+  );
+
+  const handleComment = (tweet: Tweet) => {
+    setActivatedTweet(tweet);
+    setCommentModal(true);
+    console.log(`Comment on tweet: ${tweet.id}`);
+  };
+
+  const handleRepost = (tweet: Tweet) => {
+    console.log(`Repost tweet: ${tweet.id}`);
+  };
+
+  const handleLike = (tweet: Tweet) => {
+    likedTweets[tweet.id]
+      ? unlikeTweet(tweet.id, tweet.author)
+      : likeTweet(tweet.id, tweet.author);
+  };
+
+  const handleAnalytics = (tweet: Tweet) => {
+    console.log(`Show analytics for tweet: ${tweet.id}`);
+  };
+
+  const handleBookmark = (tweet: Tweet) => {
+    console.log(`Bookmark tweet: ${tweet.id}`);
+  };
+
+  const interactionIcons = createInteractionIcons(
+    handleComment,
+    handleRepost,
+    handleLike,
+    handleAnalytics,
+    handleBookmark
+  );
+
   if (!tweet) {
     return <ReactLoading />;
   }
 
   return (
     <>
+      {commentModal && (
+        <CommentModal
+          isVisible={commentModal}
+          toggleCommentModal={toggleCommentModal}
+          tweet={activatedTweet}
+        />
+      )}
       <ToastContainer />
       <div className="fixed w-full bg-black/[.5] z-40 flex flex-row items-center p-4">
         <IoIosReturnLeft
@@ -135,42 +165,60 @@ const TweetThread = () => {
         <div className="mt-4 text-gray-500">
           <p>{formattedDateTime}</p>
         </div>
-        <div className="mt-2 flex flex-row max-w-60 justify-between">
-          {interactionIcons.map(({ icon, iconActivated, label }, index) => (
-            <div key={index} className="relative">
-              <button
-                onClick={() =>
-                  likedTweets[tweet.id]
-                    ? unlikeTweet(tweet.id, tweet.author)
-                    : likeTweet(tweet.id, tweet.author)
-                }
-                onMouseEnter={() => setHoveredIcon({ postId: tweet.id, label })}
-                onMouseLeave={() => setHoveredIcon(null)}
-                className={`${
-                  likedTweets[tweet.id] && label === "Like"
-                    ? "text-green-400"
-                    : "text-gray-400"
-                } hover:text-green-400 hover:bg-gray-800 transition text-xl p-2 rounded-full flex items-center space-x-1`}
-              >
-                {likedTweets[tweet.id] && label === "Like"
-                  ? iconActivated
-                  : icon}
-                {label === "Like" && (
-                  <span className="text-xs">{likeCounts[tweet.id] || ""}</span>
-                )}
-                <div
-                  className={`absolute top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 ease-in-out ${
-                    hoveredIcon?.postId === tweet.id &&
-                    hoveredIcon.label === label
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }`}
-                >
-                  {label}
+        <div className="mt-2 flex flex-row max-w-96 justify-between">
+          {interactionIcons.map(
+            (
+              { icon, iconActivated, label, color, hoverColor, action },
+              index
+            ) => {
+              let isActivated = false;
+
+              if (label === "Like" && likedTweets[tweet.id]) {
+                isActivated = true;
+              } else if (label === "Comment" && hasUserCommented[tweet.id]) {
+                isActivated = true;
+              }
+
+              return (
+                <div key={index} className="relative">
+                  <button
+                    onClick={() => action(tweet)}
+                    onMouseEnter={() =>
+                      setHoveredIcon({ postId: tweet.id, label })
+                    }
+                    onMouseLeave={() => setHoveredIcon(null)}
+                    className={`${
+                      isActivated ? color : "text-gray-400"
+                    } ${hoverColor} hover:bg-gray-800 transition text-xl p-2 rounded-full flex items-center space-x-1`}
+                  >
+                    {isActivated ? iconActivated : icon}
+
+                    {label === "Like" && (
+                      <span className="text-xs">
+                        {likeCounts[tweet.id] || ""}
+                      </span>
+                    )}
+                    {label === "Comment" && (
+                      <span className="text-xs">
+                        {totalComments[tweet.id] || ""}
+                      </span>
+                    )}
+
+                    <div
+                      className={`absolute top-10 left-1/3 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 ease-in-out ${
+                        hoveredIcon?.postId === tweet.id &&
+                        hoveredIcon.label === label
+                          ? "opacity-100"
+                          : "opacity-0 pointer-events-none"
+                      }`}
+                    >
+                      {label}
+                    </div>
+                  </button>
                 </div>
-              </button>
-            </div>
-          ))}
+              );
+            }
+          )}
         </div>
       </div>
       <UserPosts tweets={comments} isProfile={false} />

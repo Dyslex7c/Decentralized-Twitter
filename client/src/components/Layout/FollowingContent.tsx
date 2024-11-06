@@ -5,20 +5,7 @@ import { useRetrieveAllTweets } from "../../hooks/useRetrieveTweets";
 import PostBox from "./PostBox";
 import UserPosts from "./UserPosts";
 import { RootState } from "../../store";
-import { BigNumber } from "ethers";
-
-interface Tweet {
-  date: number;
-  month: string;
-  id: string;
-  name: string;
-  avatar: string;
-  author: string;
-  authorID: string;
-  content: string;
-  mediaCID: string;
-  timestamp: BigNumber;
-}
+import { Tweet } from "../../types";
 
 const FollowingContent = () => {
   const user = useSelector((state: RootState) => state.user);
