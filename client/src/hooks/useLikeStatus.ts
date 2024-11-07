@@ -1,19 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
+import { Tweet } from "../types";
 import { BigNumber, Contract } from "ethers";
 import { toast } from "react-toastify";
-
-type Tweet = {
-  date: number;
-  month: string;
-  id: string;
-  name: string;
-  avatar: string;
-  author: string;
-  authorID: string;
-  content: string;
-  mediaCID: string;
-  timestamp: BigNumber;
-};
 
 const useLikeStatus = (tweets: Tweet[], contract: Contract | null) => {
   const [likeCounts, setLikeCounts] = useState<Record<string, number>>({});

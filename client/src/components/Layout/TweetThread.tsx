@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import useLikeStatus from "../../hooks/useLikeStatus";
 import useFetchMedia from "../../hooks/useFetchMedia";
+import useRepostStatus from "../../hooks/useRepostStatus";
 import useCommentHandler from "../../hooks/useCommentHandler";
+import { useTweetContract } from "../../hooks/useTweetContract";
 import { usePostInteractions } from "../../hooks/usePostInteractions";
 import { useRetrieveComments } from "../../hooks/useRetrieveComments";
 import { createInteractionIcons } from "../../utils/InteractionIcons";
+import { RootState } from "../../store";
 import { Tweet } from "../../types";
 import ReactLoading from "react-loading";
 import { ToastContainer } from "react-toastify";
@@ -22,6 +26,8 @@ const TweetThread = () => {
   const [activatedTweet, setActivatedTweet] = useState<Tweet>();
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useSelector((state: RootState) => state.user);
+  const currentUserID = localStorage.getItem("userID");
   const tweet = location.state?.tweet as Tweet | undefined;
   const [formattedDateTime, setFormattedDateTime] = useState<string | null>(
     null
@@ -33,6 +39,7 @@ const TweetThread = () => {
   };
 
   const { contract } = usePostInteractions();
+  const { contract: tweetContract } = useTweetContract();
 
   const author = tweet?.author || "";
   const tweetId = tweet?.id || "";
@@ -85,8 +92,14 @@ const TweetThread = () => {
   };
 
   const handleRepost = (tweet: Tweet) => {
-    console.log(`Repost tweet: ${tweet.id}`);
+    console.log("reposting");
+    repostTweet(tweet, user, currentUserID);
   };
+
+  const { repostTweet, repostCounts, repostedTweets } = useRepostStatus(
+    tweet ? [tweet] : [],
+    tweetContract
+  );
 
   const handleLike = (tweet: Tweet) => {
     likedTweets[tweet.id]
@@ -178,6 +191,8 @@ const TweetThread = () => {
                 isActivated = true;
               } else if (label === "Comment" && hasUserCommented[tweet.id]) {
                 isActivated = true;
+              } else if (label === "Repost" && repostedTweets[tweet.id]) {
+                isActivated = true;
               }
 
               return (
@@ -202,6 +217,11 @@ const TweetThread = () => {
                     {label === "Comment" && (
                       <span className="text-xs">
                         {totalComments[tweet.id] || ""}
+                      </span>
+                    )}
+                    {label === "Repost" && (
+                      <span className="text-xs">
+                        {repostCounts[tweet.id] || ""}
                       </span>
                     )}
 

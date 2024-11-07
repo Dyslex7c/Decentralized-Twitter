@@ -28,6 +28,8 @@ contract PostTweet {
 
     Tweet[] public allTweets;
     mapping(address => Tweet[]) public userTweets;
+    mapping(address => mapping(uint256 => uint256)) public repostCount;
+    mapping(address => mapping (address => mapping(uint256 => bool))) public userReposts;
 
     uint256 public tweetCounter;
 
@@ -52,6 +54,7 @@ contract PostTweet {
     ) public {
         require(bytes(_content).length > 0, "Tweet content cannot be empty");
 
+        
         Tweet memory newTweet = Tweet({
             id: tweetCounter,
             name: _name,
@@ -86,9 +89,11 @@ contract PostTweet {
     }
 
     function repostTweet(uint256 tweetId, string calldata _name, string calldata _authorID, string calldata _avatar) public {
-        require(tweetId <= tweetCounter, "Invalid tweet ID");
+        require(tweetId < tweetCounter, "Invalid tweet ID");
 
         Tweet memory originalTweet = allTweets[tweetId];
+
+        require(!userReposts[msg.sender][originalTweet.author][tweetId], "You have already reposted this tweet!");
 
         Tweet memory newRepost = Tweet({
             id: tweetCounter,
@@ -107,6 +112,9 @@ contract PostTweet {
 
         allTweets.push(newRepost);
         userTweets[msg.sender].push(newRepost);
+
+        userReposts[msg.sender][originalTweet.author][tweetId] = true;
+        repostCount[originalTweet.author][tweetId] += 1;
 
         emit TweetPosted(
             tweetCounter,
@@ -156,5 +164,17 @@ contract PostTweet {
         }
 
         return allFollowedTweets;
+    }
+
+    function hasUserReposted(
+        address user,
+        address author,
+        uint256 tweetId
+    ) external view returns (bool) {
+        return userReposts[user][author][tweetId];
+    }
+
+    function getTotalReposts(address author, uint256 tweetId) external view returns (uint256) {
+        return repostCount[author][tweetId];
     }
 }

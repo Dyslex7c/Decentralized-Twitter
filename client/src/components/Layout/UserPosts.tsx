@@ -9,10 +9,10 @@ import { usePostInteractions } from "../../hooks/usePostInteractions";
 import { createInteractionIcons } from "../../utils/InteractionIcons";
 import { RootState } from "../../store";
 import { Tweet } from "../../types";
-import { toast } from "react-toastify";
 import { BigNumber } from "ethers";
 import ReactLoading from "react-loading";
 import CommentModal from "../Overlay/CommentModal";
+import useRepostStatus from "../../hooks/useRepostStatus";
 
 type UserPostsProps = {
   tweets: Tweet[];
@@ -71,27 +71,13 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
 
   const handleRepost = (tweet: Tweet) => {
     console.log("reposting");
-    repostTweet(tweet);
+    repostTweet(tweet, user, currentUserID);
   };
 
-  const repostTweet = async (tweet: Tweet) => {
-    if (tweetContract) {
-      try {
-        const transaction = await tweetContract.repostTweet(
-          tweet.id,
-          user?.name,
-          currentUserID,
-          user?.avatar
-        );
-        await transaction.wait();
-        toast.success("Tweet reposted successfully!");
-      } catch (error) {
-        console.error("Error posting tweet:", error);
-      }
-    } else {
-      toast.error("Contract is not available. Please connect your wallet.");
-    }
-  };
+  const { repostTweet, repostCounts, repostedTweets } = useRepostStatus(
+    tweets,
+    tweetContract
+  );
 
   const handleLike = (tweet: Tweet) => {
     likedTweets[tweet.id]
@@ -183,7 +169,7 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
               <div
                 className={`flex flex-row ${
                   tweet.isRepost
-                    ? "border border-gray-700 p-2 rounded-xl ml-14"
+                    ? "border border-gray-700 p-4 rounded-xl ml-14"
                     : ""
                 }`}
               >
@@ -251,14 +237,19 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                         index
                       ) => {
                         let isActivated = false;
+                        let displayCount = "";
 
-                        if (label === "Like" && likedTweets[tweet.id]) {
-                          isActivated = true;
-                        } else if (
-                          label === "Comment" &&
-                          hasUserCommented[tweet.id]
-                        ) {
-                          isActivated = true;
+                        if (label === "Like") {
+                          isActivated = likedTweets[tweet.id];
+                          displayCount = likeCounts[tweet.id]?.toString() || "";
+                        } else if (label === "Comment") {
+                          isActivated = hasUserCommented[tweet.id];
+                          displayCount =
+                            totalComments[tweet.id]?.toString() || "";
+                        } else if (label === "Repost") {
+                          isActivated = repostedTweets[tweet.id];
+                          displayCount =
+                            repostCounts[tweet.id]?.toString() || "";
                         }
 
                         return (
@@ -274,18 +265,9 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                               } ${hoverColor} hover:bg-gray-800 transition text-xl p-2 rounded-full flex items-center space-x-1`}
                             >
                               {isActivated ? iconActivated : icon}
-
-                              {label === "Like" && (
-                                <span className="text-xs">
-                                  {likeCounts[tweet.id] || ""}
-                                </span>
+                              {displayCount && displayCount !== "0" && (
+                                <span className="text-xs">{displayCount}</span>
                               )}
-                              {label === "Comment" && (
-                                <span className="text-xs">
-                                  {totalComments[tweet.id] || ""}
-                                </span>
-                              )}
-
                               <div
                                 className={`absolute top-10 left-1/3 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 ease-in-out ${
                                   hoveredIcon?.postId === tweet.id &&

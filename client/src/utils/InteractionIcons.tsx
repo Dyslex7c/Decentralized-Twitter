@@ -29,6 +29,7 @@ export const createInteractionIcons = (
   },
   {
     icon: <BiRepost />,
+    iconActivated: <BiRepost />,
     label: "Repost",
     color: "text-green-400",
     hoverColor: "hover:text-green-400",
