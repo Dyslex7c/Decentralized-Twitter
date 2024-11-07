@@ -13,6 +13,7 @@ import { BigNumber } from "ethers";
 import ReactLoading from "react-loading";
 import CommentModal from "../Overlay/CommentModal";
 import useRepostStatus from "../../hooks/useRepostStatus";
+import useBookmarkStatus from "../../hooks/useBookmarkStatus";
 
 type UserPostsProps = {
   tweets: Tweet[];
@@ -79,6 +80,9 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
     tweetContract
   );
 
+  const { bookmarkCounts, bookmarkedTweets, bookmarkTweet, unbookmarkTweet } =
+    useBookmarkStatus(tweets, contract);
+
   const handleLike = (tweet: Tweet) => {
     likedTweets[tweet.id]
       ? unlikeTweet(tweet.id, tweet.author)
@@ -90,6 +94,9 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
   };
 
   const handleBookmark = (tweet: Tweet) => {
+    bookmarkedTweets[tweet.id]
+      ? unbookmarkTweet(tweet.id, tweet.author)
+      : bookmarkTweet(tweet.id, tweet.author);
     console.log(`Bookmark tweet: ${tweet.id}`);
   };
 
@@ -250,6 +257,10 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                           isActivated = repostedTweets[tweet.id];
                           displayCount =
                             repostCounts[tweet.id]?.toString() || "";
+                        } else if (label === "Bookmark") {
+                          isActivated = bookmarkedTweets[tweet.id];
+                          displayCount =
+                            bookmarkCounts[tweet.id]?.toString() || "";
                         }
 
                         return (

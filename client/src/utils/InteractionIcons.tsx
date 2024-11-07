@@ -1,5 +1,5 @@
 import { MdModeComment, MdOutlineModeComment } from "react-icons/md";
-import { BiBookmark, BiLike, BiRepost, BiSolidLike } from "react-icons/bi";
+import { BiBookmark, BiLike, BiRepost, BiSolidBookmark, BiSolidLike } from "react-icons/bi";
 import { SiGoogleanalytics } from "react-icons/si";
 import { Tweet } from "../types";
 
@@ -52,9 +52,10 @@ export const createInteractionIcons = (
   },
   {
     icon: <BiBookmark />,
+    iconActivated: <BiSolidBookmark />,
     label: "Bookmark",
-    color: "text-blue-400",
-    hoverColor: "hover:text-blue-400",
+    color: "text-orange-400",
+    hoverColor: "hover:text-orange-400",
     action: handleBookmark,
   },
 ];

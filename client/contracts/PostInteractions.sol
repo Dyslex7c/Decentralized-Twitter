@@ -12,6 +12,11 @@ contract PostInteractions {
 
     mapping(address => mapping(uint256 => uint256)) public likeCount;
 
+    mapping(address => mapping(address => mapping(uint256 => bool)))
+        public bookmarks;
+
+    mapping(address => mapping(uint256 => uint256)) public bookmarkCount;
+
     struct Comment {
         uint256 id;
         string name;
@@ -46,6 +51,16 @@ contract PostInteractions {
         string content,
         string mediaCID,
         uint256 timestamp
+    );
+    event TweetBookmarked(
+        address indexed user,
+        address indexed author,
+        uint256 indexed tweetId
+    );
+    event TweetUnbookmarked(
+        address indexed user,
+        address indexed author,
+        uint256 indexed tweetId
     );
 
     uint256 public commentCounter;
@@ -157,5 +172,43 @@ contract PostInteractions {
             }
         }
         return false;
+    }
+
+    function bookmarkTweet(address author, uint256 tweetId) external {
+        require(
+            !bookmarks[msg.sender][author][tweetId],
+            "You have already bookmarked this tweet"
+        );
+
+        bookmarks[msg.sender][author][tweetId] = true;
+        bookmarkCount[author][tweetId] += 1;
+
+        emit TweetBookmarked(msg.sender, author, tweetId);
+    }
+
+    function unbookmarkTweet(address author, uint256 tweetId) external {
+        require(
+            bookmarks[msg.sender][author][tweetId],
+            "You have not bookmarked this tweet"
+        );
+
+        bookmarks[msg.sender][author][tweetId] = false;
+        bookmarkCount[author][tweetId] -= 1;
+
+        emit TweetUnbookmarked(msg.sender, author, tweetId);
+    }
+
+    function getTotalBookmarks(
+        address author,
+        uint256 tweetId
+    ) external view returns (uint256) {
+        return bookmarkCount[author][tweetId];
+    }
+
+    function hasUserBookmarked(
+        address author,
+        uint256 tweetId
+    ) external view returns (bool) {
+        return bookmarks[msg.sender][author][tweetId];
     }
 }

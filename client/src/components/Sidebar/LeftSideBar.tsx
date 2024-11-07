@@ -29,7 +29,6 @@ const bannerItems = [
   { name: "Messages", icon: <IoIosChatboxes />, route: "/messages" },
   { name: "Communities", icon: <IoIosPeople />, route: "/communities" },
   { name: "Profile", icon: <IoIosPerson />, route: "/profile" },
-  { name: "More", icon: <IoIosMore /> },
 ];
 
 const LeftSideBar = () => {
@@ -42,9 +41,12 @@ const LeftSideBar = () => {
 
   const [userNameModal, setUserNameModal] = useState(true);
   const [dropdownPopoverShow, setDropdownPopoverShow] = useState(false);
+  const [moreDropdownShow, setMoreDropdownShow] = useState(false);
 
   const btnDropdownRef = useRef<HTMLButtonElement>(null);
   const popoverDropdownRef = useRef<HTMLDivElement>(null);
+  const btnMoreRef = useRef<HTMLButtonElement>(null);
+  const moreDropdownRef = useRef<HTMLDivElement>(null);
 
   const address = user?.address;
   const NAMESPACE = process.env.REACT_APP_UUID_NAMESPACE;
@@ -82,6 +84,10 @@ const LeftSideBar = () => {
     setDropdownPopoverShow((prev) => !prev);
   };
 
+  const toggleMoreDropdown = () => {
+    setMoreDropdownShow((prev) => !prev);
+  };
+
   const handleClickOutside = (event: MouseEvent) => {
     if (
       popoverDropdownRef.current &&
@@ -91,6 +97,14 @@ const LeftSideBar = () => {
     ) {
       setDropdownPopoverShow(false);
     }
+    if (
+      moreDropdownRef.current &&
+      !moreDropdownRef.current.contains(event.target as Node) &&
+      btnMoreRef.current &&
+      !btnMoreRef.current.contains(event.target as Node)
+    ) {
+      setMoreDropdownShow(false);
+    }
   };
 
   useEffect(() => {
@@ -98,7 +112,16 @@ const LeftSideBar = () => {
       createPopper(btnDropdownRef.current!, popoverDropdownRef.current!, {
         placement: "top-end",
         modifiers: [
-          { name: "offset", options: { offset: [0, -10] } },
+          { name: "offset", options: { offset: [0, 0] } },
+          { name: "preventOverflow", options: { boundary: "viewport" } },
+        ],
+      });
+    }
+    if (moreDropdownShow) {
+      createPopper(btnMoreRef.current!, moreDropdownRef.current!, {
+        placement: "top-end",
+        modifiers: [
+          { name: "offset", options: { offset: [0, 0] } },
           { name: "preventOverflow", options: { boundary: "viewport" } },
         ],
       });
@@ -107,12 +130,12 @@ const LeftSideBar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [dropdownPopoverShow]);
+  }, [dropdownPopoverShow, moreDropdownShow]);
 
   return (
     <div className="flex flex-col fixed border-r h-screen flex-shrink-0 w-20 lg:w-80 border-gray-700">
       <div
-        className="flex flex-col p-3 lg:p-4 lg:pl-12 gap-y-2"
+        className="relative flex flex-col p-3 lg:p-4 lg:pl-12 gap-y-2"
         style={{ fontFamily: "Roboto", fontWeight: 300 }}
       >
         <div className="mb-2">
@@ -134,6 +157,39 @@ const LeftSideBar = () => {
             <span className="hidden lg:block">{name}</span>
           </button>
         ))}
+
+        <button
+          ref={btnMoreRef}
+          onClick={toggleMoreDropdown}
+          className="flex items-center gap-2 text-xl text-white p-2 rounded hover:text-blue-400 transition duration-300"
+        >
+          <span className="text-4xl">
+            <IoIosMore />
+          </span>
+          <span className="hidden lg:block">More</span>
+        </button>
+
+        <div
+          ref={moreDropdownRef}
+          className={`${
+            moreDropdownShow ? "block animate-fade-in" : "hidden"
+          } absolute shadow-lg shadow-blue-500 rounded py-2 bg-black z-10`}
+          style={{
+            minWidth: "12rem",
+            top: "-20px !important",
+            left: "100px !important",
+          }}
+        >
+          <button
+            onClick={() => navigate("/bookmarks")}
+            className="text-sm py-4 px-4 font-normal block w-full whitespace-nowrap hover:bg-gray-700 transition duration-300"
+          >
+            Bookmarks
+          </button>
+          <button className="text-sm py-4 px-4 font-normal block w-full whitespace-nowrap hover:bg-gray-700 transition duration-300">
+            Help
+          </button>
+        </div>
 
         <button
           className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white ml-1 p-3 px-6 lg:px-16 mb-12 mr-5 rounded-full flex items-center justify-center gap-2"
