@@ -1,12 +1,13 @@
 import { ChangeEvent, useState } from "react";
-import { usePostInteractions } from "../../hooks/usePostInteractions";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import ReactLoading from "react-loading";
-import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { Tweet } from "../../types";
+import { useSelector } from "react-redux";
+import useCommentHandler from "../../hooks/useCommentHandler";
+import { usePostInteractions } from "../../hooks/usePostInteractions";
 import axios from "axios";
+import { RootState } from "../../store";
+import { Tweet } from "../../types";
+import { toast } from "react-toastify";
+import ReactLoading from "react-loading";
 import {
   MdOutlineGif,
   MdOutlinePermMedia,
@@ -34,10 +35,12 @@ const CommentModal = ({
   toggleCommentModal,
   isVisible,
   tweet,
+  tweets,
 }: {
   toggleCommentModal: () => void;
   isVisible: boolean;
   tweet: Tweet | undefined;
+  tweets: Tweet[];
 }) => {
   const [comment, setComment] = useState<Comment>({
     comment: "",
@@ -53,6 +56,8 @@ const CommentModal = ({
 
   const user = useSelector((state: RootState) => state.user);
   const { contract } = usePostInteractions();
+
+  const { handleSetComment } = useCommentHandler(tweets, contract);
 
   const handleIconClick = async (key: string) => {
     switch (key) {
@@ -131,25 +136,6 @@ const CommentModal = ({
       }));
     };
 
-  const handleSetComment = async (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    if (contract) {
-      const transaction = await contract.addComment(
-        tweet?.author,
-        tweet?.id,
-        user?.name,
-        userID,
-        user?.avatar,
-        comment.comment,
-        mediaCID || ""
-      );
-      await transaction.wait();
-      toast.success("Comment added successfully!");
-      toggleCommentModal();
-    }
-  };
-
   if (!tweet) {
     return <ReactLoading />;
   }
@@ -177,7 +163,6 @@ const CommentModal = ({
           </svg>
         </div>
       </div>
-      <ToastContainer />
       <div
         className={`relative bg-black shadow-2xl shadow-blue-500 p-4 md:p-7 max-w-lg min-w-[300px] leading-relaxed transition-all duration-300 ease-in-out transform ${
           isVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
@@ -274,7 +259,16 @@ const CommentModal = ({
         )}
         <div className="flex justify-center mt-4">
           <button
-            onClick={handleSetComment}
+            onClick={() =>
+              handleSetComment(
+                tweet,
+                user,
+                userID,
+                comment,
+                mediaCID,
+                toggleCommentModal
+              )
+            }
             className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white p-3 px-16 rounded-full flex items-center justify-center gap-2"
           >
             <span

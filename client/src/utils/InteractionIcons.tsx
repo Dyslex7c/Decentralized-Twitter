@@ -1,20 +1,7 @@
 import { MdModeComment, MdOutlineModeComment } from "react-icons/md";
 import { BiBookmark, BiLike, BiRepost, BiSolidLike } from "react-icons/bi";
 import { SiGoogleanalytics } from "react-icons/si";
-import { BigNumber } from "ethers";
-
-type Tweet = {
-  date: number;
-  month: string;
-  id: string;
-  name: string;
-  avatar: string;
-  author: string;
-  authorID: string;
-  content: string;
-  mediaCID: string;
-  timestamp: BigNumber;
-};
+import { Tweet } from "../types";
 
 type InteractionIcon = {
   icon: JSX.Element;

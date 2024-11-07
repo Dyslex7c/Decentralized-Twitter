@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import ReactLoading from "react-loading";
-import { IoIosReturnLeft } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import useFetchMedia from "../../hooks/useFetchMedia";
-import { BigNumber } from "ethers";
 import useLikeStatus from "../../hooks/useLikeStatus";
+import useFetchMedia from "../../hooks/useFetchMedia";
+import useCommentHandler from "../../hooks/useCommentHandler";
 import { usePostInteractions } from "../../hooks/usePostInteractions";
 import { useRetrieveComments } from "../../hooks/useRetrieveComments";
-import UserPosts from "./UserPosts";
-import { Tweet } from "../../types";
 import { createInteractionIcons } from "../../utils/InteractionIcons";
+import { Tweet } from "../../types";
+import ReactLoading from "react-loading";
+import { ToastContainer } from "react-toastify";
+import { IoIosReturnLeft } from "react-icons/io";
+import { BigNumber } from "ethers";
+import UserPosts from "./UserPosts";
 import CommentModal from "../Overlay/CommentModal";
-import useCommentHandler from "../../hooks/useCommentHandler";
 
 const TweetThread = () => {
   const [hoveredIcon, setHoveredIcon] = useState<{
@@ -121,6 +121,7 @@ const TweetThread = () => {
           isVisible={commentModal}
           toggleCommentModal={toggleCommentModal}
           tweet={activatedTweet}
+          tweets={[tweet]}
         />
       )}
       <ToastContainer />

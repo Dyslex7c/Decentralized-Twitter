@@ -7,6 +7,15 @@ type Tweet = {
   author: string;
 };
 
+interface Comment {
+  comment: string;
+}
+
+interface User {
+  name: string;
+  avatar: string;
+}
+
 const useCommentHandler = (tweets: Tweet[], contract: Contract | null) => {
   const [totalComments, setTotalComments] = useState<Record<string, number>>(
     {}
@@ -14,6 +23,27 @@ const useCommentHandler = (tweets: Tweet[], contract: Contract | null) => {
   const [hasUserCommented, setHasUserCommented] = useState<
     Record<string, boolean>
   >({});
+
+  const handleSetComment = async (
+    tweet: Tweet | undefined, user: User | null, userID: string | null, comment: Comment, mediaCID: string | null, toggleCommentModal: () => void
+  ) => {
+    if (contract) {
+      const transaction = await contract.addComment(
+        tweet?.author,
+        tweet?.id,
+        user?.name,
+        userID,
+        user?.avatar,
+        comment.comment,
+        mediaCID || ""
+      );
+      await transaction.wait();
+      toast.success("Comment added successfully!");
+      fetchTotalComments();
+      checkIfUserCommented();
+      toggleCommentModal();
+    }
+  };
 
   const fetchTotalComments = useCallback(async () => {
     if (contract) {
@@ -62,7 +92,7 @@ const useCommentHandler = (tweets: Tweet[], contract: Contract | null) => {
     checkIfUserCommented();
   }, [fetchTotalComments, checkIfUserCommented]);
 
-  return { totalComments, hasUserCommented };
+  return { handleSetComment, totalComments, hasUserCommented };
 };
 
 export default useCommentHandler;

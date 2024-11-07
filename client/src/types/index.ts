@@ -11,4 +11,8 @@ export type Tweet = {
   content: string;
   mediaCID: string;
   timestamp: BigNumber;
+  isRepost: boolean;
+  reposter: string;
+  reposterID: string;
+  reposterAvatar: string;
 };

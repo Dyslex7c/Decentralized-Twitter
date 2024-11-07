@@ -20,6 +20,10 @@ contract PostTweet {
         string content;
         string mediaCID;
         uint256 timestamp;
+        bool isRepost;
+        string reposter;
+        string reposterID;
+        string reposterAvatar;
     }
 
     Tweet[] public allTweets;
@@ -35,7 +39,8 @@ contract PostTweet {
         string avatar,
         string content,
         string mediaCID,
-        uint256 timestamp
+        uint256 timestamp,
+        bool isRepost
     );
 
     function postTweet(
@@ -55,7 +60,11 @@ contract PostTweet {
             avatar: _avatar,
             content: _content,
             mediaCID: _mediaCID,
-            timestamp: block.timestamp
+            timestamp: block.timestamp,
+            isRepost: false,
+            reposter: "",
+            reposterID: "",
+            reposterAvatar: ""
         });
 
         allTweets.push(newTweet);
@@ -69,7 +78,46 @@ contract PostTweet {
             _avatar,
             _content,
             _mediaCID,
-            block.timestamp
+            block.timestamp,
+            false
+        );
+
+        tweetCounter++;
+    }
+
+    function repostTweet(uint256 tweetId, string calldata _name, string calldata _authorID, string calldata _avatar) public {
+        require(tweetId <= tweetCounter, "Invalid tweet ID");
+
+        Tweet memory originalTweet = allTweets[tweetId];
+
+        Tweet memory newRepost = Tweet({
+            id: tweetCounter,
+            name: originalTweet.name,
+            author: msg.sender,
+            authorID: originalTweet.authorID,
+            avatar: originalTweet.avatar,
+            content: originalTweet.content,
+            mediaCID: originalTweet.mediaCID,
+            timestamp: block.timestamp,
+            isRepost: true,
+            reposter: _name,
+            reposterID: _authorID,
+            reposterAvatar: _avatar
+        });
+
+        allTweets.push(newRepost);
+        userTweets[msg.sender].push(newRepost);
+
+        emit TweetPosted(
+            tweetCounter,
+            msg.sender,
+            originalTweet.authorID,
+            originalTweet.name,
+            originalTweet.avatar,
+            originalTweet.content,
+            originalTweet.mediaCID,
+            block.timestamp,
+            true
         );
 
         tweetCounter++;
