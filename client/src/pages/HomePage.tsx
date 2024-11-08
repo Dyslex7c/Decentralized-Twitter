@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ForYouContent from "../components/Layout/ForYouContent";
 import FollowingContent from "../components/Layout/FollowingContent";
 

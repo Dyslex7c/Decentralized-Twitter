@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useRetrieveFollowingList } from "../../hooks/useRetrieveFollowers";
 import { useRetrieveAllTweets } from "../../hooks/useRetrieveTweets";
-import PostBox from "./PostBox";
-import UserPosts from "./UserPosts";
+import { useRetrieveFollowingList } from "../../hooks/useRetrieveFollowers";
 import { RootState } from "../../store";
 import { Tweet } from "../../types";
+import UserPosts from "./UserPosts";
+import PostBox from "./PostBox";
 
 const FollowingContent = () => {
   const user = useSelector((state: RootState) => state.user);

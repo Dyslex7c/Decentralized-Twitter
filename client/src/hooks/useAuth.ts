@@ -68,7 +68,7 @@ export const useAuth = () => {
           method: "eth_requestAccounts",
         });
         setIsWalletConnected(true);
-        const address = ethers.utils.getAddress(userAddress)
+        const address = ethers.utils.getAddress(userAddress);
         handleMetaMaskLogin(address);
       } else {
         toast.warn(

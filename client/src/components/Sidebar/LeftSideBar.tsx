@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import logo from "../../assets/logo.png";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { clearUser } from "../../state";
 import {
   IoIosChatboxes,
   IoIosHome,
@@ -9,14 +12,11 @@ import {
   IoIosSearch,
   IoIosNotifications,
 } from "react-icons/io";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { v5 as uuidv5 } from "uuid";
 import { createPopper } from "@popperjs/core";
 import { FaPlus } from "react-icons/fa";
-import { clearUser } from "../../state";
-import { RootState } from "../../store";
 import UsernameModal from "../Overlay/UsernameModal";
+import logo from "../../assets/logo.png";
 
 const bannerItems = [
   { name: "Home", icon: <IoIosHome />, route: "/home" },

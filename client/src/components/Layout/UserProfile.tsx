@@ -6,8 +6,8 @@ import {
   useRetrieveFollowingList,
 } from "../../hooks/useRetrieveFollowers";
 import { useFollowSystem } from "../../hooks/useFollowSystem";
-import { IoIosReturnLeft } from "react-icons/io";
 import { RootState } from "../../store";
+import { IoIosReturnLeft } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 
 interface User {

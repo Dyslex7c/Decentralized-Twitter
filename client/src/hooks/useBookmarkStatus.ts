@@ -4,9 +4,9 @@ import { BigNumber, Contract } from "ethers";
 import { toast } from "react-toastify";
 
 const useBookmarkStatus = (tweets: Tweet[], contract: Contract | null) => {
-  const [bookmarkCounts, setBookmarkCounts] = useState
-  <Record<string, number>
-  >({});
+  const [bookmarkCounts, setBookmarkCounts] = useState<Record<string, number>>(
+    {}
+  );
   const [bookmarkedTweets, setBookmarkedTweets] = useState<
     Record<string, boolean>
   >({});

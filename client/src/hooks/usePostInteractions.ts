@@ -7,7 +7,7 @@ const CONTRACT_ADDRESS = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 export const usePostInteractions = () => {
   const [provider, setProvider] = useState<providers.Web3Provider | null>(null);
   const [contract, setContract] = useState<Contract | null>(null);
-    
+
   useEffect(() => {
     const loadPostInteractionsContract = async () => {
       if (window.ethereum) {

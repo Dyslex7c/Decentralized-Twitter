@@ -25,7 +25,12 @@ const useCommentHandler = (tweets: Tweet[], contract: Contract | null) => {
   >({});
 
   const handleSetComment = async (
-    tweet: Tweet | undefined, user: User | null, userID: string | null, comment: Comment, mediaCID: string | null, toggleCommentModal: () => void
+    tweet: Tweet | undefined,
+    user: User | null,
+    userID: string | null,
+    comment: Comment,
+    mediaCID: string | null,
+    toggleCommentModal: () => void
   ) => {
     if (contract) {
       const transaction = await contract.addComment(

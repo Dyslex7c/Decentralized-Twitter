@@ -3,7 +3,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import useFetchMedia from "../../hooks/useFetchMedia";
 import useLikeStatus from "../../hooks/useLikeStatus";
+import useRepostStatus from "../../hooks/useRepostStatus";
 import useCommentHandler from "../../hooks/useCommentHandler";
+import useBookmarkStatus from "../../hooks/useBookmarkStatus";
 import { useTweetContract } from "../../hooks/useTweetContract";
 import { usePostInteractions } from "../../hooks/usePostInteractions";
 import { createInteractionIcons } from "../../utils/InteractionIcons";
@@ -12,8 +14,6 @@ import { Tweet } from "../../types";
 import { BigNumber } from "ethers";
 import ReactLoading from "react-loading";
 import CommentModal from "../Overlay/CommentModal";
-import useRepostStatus from "../../hooks/useRepostStatus";
-import useBookmarkStatus from "../../hooks/useBookmarkStatus";
 
 type UserPostsProps = {
   tweets: Tweet[];

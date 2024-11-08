@@ -18,21 +18,22 @@ const RegisterModal = ({
   isVisible: boolean;
 }) => {
   const [userData, setUserData] = useState<UserData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
   });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleFieldChange = (field: keyof UserData) => (event: ChangeEvent<HTMLInputElement>) => {
-    setUserData((prevData) => ({
-      ...prevData,
-      [field]: event.target.value,
-    }));
-  };
+  const handleFieldChange =
+    (field: keyof UserData) => (event: ChangeEvent<HTMLInputElement>) => {
+      setUserData((prevData) => ({
+        ...prevData,
+        [field]: event.target.value,
+      }));
+    };
 
   const handleRegister = async (userData: UserData) => {
     try {
@@ -49,13 +50,13 @@ const RegisterModal = ({
       }
 
       const registered = await response.json();
-      
+
       const userResponse = await fetch("http://localhost:3001/users/me", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${registered.access_token}`,
-        }
+        },
       });
 
       const registeredUser = await userResponse.json();
@@ -65,14 +66,14 @@ const RegisterModal = ({
         setUser({
           user: {
             name:
-              `${registeredUser.firstName} ${registeredUser.lastName}` || "User",
+              `${registeredUser.firstName} ${registeredUser.lastName}` ||
+              "User",
             avatar: "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
           },
           token: registered.access_token,
         })
       );
       navigate("/home");
-      
     } catch (err) {
       console.log(err);
     }
