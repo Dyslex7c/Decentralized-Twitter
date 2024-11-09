@@ -9,7 +9,7 @@ const HomePage = () => {
   if (!userID) return null;
 
   return (
-    <div className="flex flex-col sm:w-3/5 h-screen">
+    <div className="flex flex-col w-full h-screen">
       <div className="flex justify-evenly text-gray-400 sticky top-0 bg-black z-10">
         <button onClick={() => setActiveComponent("foryou")} className="w-1/2">
           <div

@@ -163,7 +163,12 @@ const TweetThread = () => {
           />
           <div className="hidden lg:block flex-col text-md">
             <p className="font-bold">{tweet.name}</p>
-            <p className="text-gray-500">@{tweet.authorID}</p>
+            <p
+              onClick={() => navigate(`/profile/${tweet.authorID}`)}
+              className="text-gray-500"
+            >
+              @{tweet.authorID}
+            </p>
           </div>
         </div>
         <div className="mt-2 text-xl">

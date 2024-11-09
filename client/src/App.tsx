@@ -7,13 +7,14 @@ import ExplorePage from "./pages/ExplorePage";
 import ProfilePage from "./pages/ProfilePage";
 import TweetThread from "./components/Layout/TweetThread";
 import Bookmarks from "./components/Layout/Bookmarks";
+import RightSideBar from "./components/Sidebar/RightSideBar";
 // import { useSelector } from "react-redux";
 // import { RootState } from "./store";
 
 const AppLayout = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === "/";
-  //const user = useSelector((state: RootState) => state.user);
+
   return (
     <div className="flex">
       {!isLoginPage && <LeftSideBar />}
@@ -28,6 +29,12 @@ const AppLayout = () => {
           <Route path="/bookmarks" element={<Bookmarks />} />
         </Routes>
       </div>
+
+      {!isLoginPage && (
+        <div className="hidden lg:block lg:w-[20rem] xl:w-[30rem]">
+          <RightSideBar />
+        </div>
+      )}
     </div>
   );
 };

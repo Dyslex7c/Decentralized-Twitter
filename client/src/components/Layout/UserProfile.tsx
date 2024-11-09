@@ -93,7 +93,7 @@ const UserProfile = ({ tweetCount, user }: UserProfileProps) => {
   return (
     <>
       <ToastContainer />
-      <div className="fixed w-full bg-black/[.5] z-40 flex flex-row items-center p-4">
+      <div className="fixed bg-black/[.5] z-40 flex flex-row items-center p-4 w-[36rem]">
         <IoIosReturnLeft
           onClick={() => navigate("/home")}
           className="text-2xl mr-4 cursor-pointer"

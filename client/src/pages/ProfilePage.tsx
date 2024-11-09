@@ -91,7 +91,7 @@ const ProfilePage = () => {
   const { tweets } = useRetrieveTweetsByUser(userAddress || "");
 
   return (
-    <>
+    <div className="flex flex-col h-full m-0 p-0 border-r border-gray-700">
       <UserProfile
         tweetCount={tweets.length}
         user={isCurrentUser ? currentUser : otherUser}
@@ -119,7 +119,7 @@ const ProfilePage = () => {
       {activeComponent === "posts" && (
         <UserPosts tweets={tweets} isProfile={true} />
       )}
-    </>
+    </div>
   );
 };
 
