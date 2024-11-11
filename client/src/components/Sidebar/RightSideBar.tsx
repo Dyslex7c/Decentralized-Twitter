@@ -1,10 +1,11 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 
 const RightSideBar = () => {
   const user = useSelector((state: RootState) => state.user);
   const userID = localStorage.getItem("userID");
+
+  if (!userID) return null;
 
   return (
     <div className="fixed w-full h-full">

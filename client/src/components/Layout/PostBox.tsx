@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useTweetContract } from "../../hooks/useTweetContract";
 import axios from "axios";
+import { v5 as uuidv5 } from "uuid";
 import {
   MdOutlineGif,
   MdOutlinePermMedia,
@@ -22,6 +23,7 @@ const icons = [
 
 const PINATA_API_KEY = process.env.REACT_APP_PINATA_API_KEY;
 const PINATA_SECRET_API_KEY = process.env.REACT_APP_PINATA_API_SECRET;
+const NAMESPACE = process.env.REACT_APP_UUID_NAMESPACE;
 
 const PostBox = () => {
   const [text, setText] = useState("");
@@ -53,7 +55,7 @@ const PostBox = () => {
         createPoll();
         break;
       case "anonymous":
-        toggleAnonymousPost();
+        postAnonymousTweet();
         break;
       case "schedule":
         alert("Scheduling feature coming soon!");
@@ -106,17 +108,57 @@ const PostBox = () => {
     alert("Poll creation is not available in this version.");
   };
 
-  const toggleAnonymousPost = () => {
-    alert("Posting anonymously!");
-  };
-
   const postTweet = async () => {
     if (contract) {
       try {
+        if (postType === "Mutable") {
+          const transaction = await contract.postMutableTweet(
+            user?.name,
+            userID,
+            user?.avatar,
+            text,
+            mediaCID || ""
+          );
+          await transaction.wait();
+        } else {
+          const transaction = await contract.postTweet(
+            user?.name,
+            userID,
+            user?.avatar,
+            text,
+            mediaCID || ""
+          );
+          await transaction.wait();
+        }
+        toast.success("Tweet posted successfully!");
+        setText("");
+        setPreviewMediaURL(null);
+        setMediaCID(null);
+        setMediaType(null);
+      } catch (error) {
+        console.error("Error posting tweet:", error);
+      }
+    } else {
+      toast.error("Contract is not available. Please connect your wallet.");
+    }
+  };
+  console.log(user?.walletAddress);
+  console.log(NAMESPACE);
+
+  const generateUserID = () => {
+    if (!user || !NAMESPACE) return;
+    const uuid = uuidv5(user?.walletAddress || "", NAMESPACE);
+    const userID = `user_${uuid.slice(0, 8)}`;
+    return userID;
+  };
+
+  const postAnonymousTweet = async () => {
+    if (contract) {
+      try {
         const transaction = await contract.postTweet(
-          user?.name,
-          userID,
-          user?.avatar,
+          "Anonymous",
+          generateUserID(),
+          "https://cdn-icons-png.flaticon.com/128/10/10960.png",
           text,
           mediaCID || ""
         );
@@ -202,7 +244,7 @@ const PostBox = () => {
       </div>
 
       {postType === "Immutable" && (
-        <p className="text-[#ff0000] text-sm mt-8">
+        <p className="text-[#ff0000] text-sm mt-8 w-[32rem]">
           Warning: Posts flagged as immutable are permanent and cannot be
           modified or deleted once submitted. Refrain from posting stuff which
           you're gonna delete anyway, such as casual selfies and pictures from

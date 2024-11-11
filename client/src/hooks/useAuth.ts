@@ -31,34 +31,43 @@ export const useAuth = () => {
       theme: "dark",
       prompt: "select_account",
     });
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-        const user = result.user;
-        console.log(token);
-        console.log(user);
-        if (token === null || !token) return;
-        dispatch(
-          setUser({
-            user: {
-              name: user.displayName || "User",
-              avatar:
-                user.photoURL ||
-                "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
-            },
-            token: token,
-          })
-        );
-        navigate("/home");
-      })
-      .catch((err) => {
-        const errorCode = err.code;
-        const errorMessage = err.message;
-        const email = err.customData.email;
-        const credential = GoogleAuthProvider.credentialFromError(err);
-        console.log(errorCode, errorMessage, email, credential);
+    if (window.ethereum && typeof window.ethereum.request !== "undefined") {
+      const [userAddress] = await window.ethereum.request({
+        method: "eth_requestAccounts",
       });
+      setIsWalletConnected(true);
+      const address = ethers.utils.getAddress(userAddress);
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential?.accessToken;
+          const user = result.user;
+          console.log(token);
+          console.log(user);
+
+          if (token === null || !token) return;
+          dispatch(
+            setUser({
+              user: {
+                name: user.displayName || "User",
+                avatar:
+                  user.photoURL ||
+                  "https://cdn-icons-png.flaticon.com/128/3177/3177440.png",
+                walletAddress: address,
+              },
+              token: token,
+            })
+          );
+          navigate("/home");
+        })
+        .catch((err) => {
+          const errorCode = err.code;
+          const errorMessage = err.message;
+          const email = err.customData.email;
+          const credential = GoogleAuthProvider.credentialFromError(err);
+          console.log(errorCode, errorMessage, email, credential);
+        });
+    }
   };
 
   const connectWallet = async (): Promise<void> => {

@@ -4,6 +4,7 @@ interface User {
   name: string;
   avatar: string;
   address?: string;
+  walletAddress?: string;
 }
 
 interface AuthState {
@@ -33,7 +34,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.viewedUser = null;
-    }
+    },
   },
 });
 

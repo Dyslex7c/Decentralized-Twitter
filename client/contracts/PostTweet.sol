@@ -24,12 +24,14 @@ contract PostTweet {
         string reposter;
         string reposterID;
         string reposterAvatar;
+        bool isMutable;
     }
 
     Tweet[] public allTweets;
     mapping(address => Tweet[]) public userTweets;
     mapping(address => mapping(uint256 => uint256)) public repostCount;
-    mapping(address => mapping (address => mapping(uint256 => bool))) public userReposts;
+    mapping(address => mapping(address => mapping(uint256 => bool)))
+        public userReposts;
 
     uint256 public tweetCounter;
 
@@ -42,7 +44,8 @@ contract PostTweet {
         string content,
         string mediaCID,
         uint256 timestamp,
-        bool isRepost
+        bool isRepost,
+        bool isMutable
     );
 
     function postTweet(
@@ -54,7 +57,6 @@ contract PostTweet {
     ) public {
         require(bytes(_content).length > 0, "Tweet content cannot be empty");
 
-        
         Tweet memory newTweet = Tweet({
             id: tweetCounter,
             name: _name,
@@ -67,7 +69,8 @@ contract PostTweet {
             isRepost: false,
             reposter: "",
             reposterID: "",
-            reposterAvatar: ""
+            reposterAvatar: "",
+            isMutable: false
         });
 
         allTweets.push(newTweet);
@@ -82,18 +85,99 @@ contract PostTweet {
             _content,
             _mediaCID,
             block.timestamp,
+            false,
             false
         );
 
         tweetCounter++;
     }
 
-    function repostTweet(uint256 tweetId, string calldata _name, string calldata _authorID, string calldata _avatar) public {
+    function postMutableTweet(
+        string calldata _name,
+        string calldata _authorID,
+        string calldata _avatar,
+        string calldata _content,
+        string calldata _mediaCID
+    ) public {
+        require(bytes(_content).length > 0, "Tweet content cannot be empty");
+
+        Tweet memory newTweet = Tweet({
+            id: tweetCounter,
+            name: _name,
+            author: msg.sender,
+            authorID: _authorID,
+            avatar: _avatar,
+            content: _content,
+            mediaCID: _mediaCID,
+            timestamp: block.timestamp,
+            isRepost: false,
+            reposter: "",
+            reposterID: "",
+            reposterAvatar: "",
+            isMutable: true
+        });
+
+        allTweets.push(newTweet);
+        userTweets[msg.sender].push(newTweet);
+
+        emit TweetPosted(
+            tweetCounter,
+            msg.sender,
+            _authorID,
+            _name,
+            _avatar,
+            _content,
+            _mediaCID,
+            block.timestamp,
+            false,
+            true
+        );
+
+        tweetCounter++;
+    }
+
+    function editTweet(
+        uint256 tweetId,
+        string memory _content,
+        string memory _mediaCID
+    ) public {
+        Tweet storage tweet = allTweets[tweetId];
+        require(
+            tweet.author == msg.sender,
+            "Only the author of this tweet can edit"
+        );
+        require(tweet.isMutable, "Tweet is not mutable");
+
+        tweet.content = _content;
+        tweet.mediaCID = _mediaCID;
+    }
+
+    function deleteTweet(uint256 tweetId) public {
+        Tweet storage tweet = allTweets[tweetId];
+        require(
+            tweet.author == msg.sender,
+            "Only the author of this tweet can delete"
+        );
+        require(tweet.isMutable, "Tweet is not mutable");
+
+        delete allTweets[tweetId];
+        delete userTweets[msg.sender][tweetId];
+    }
+
+    function repostTweet(
+        uint256 tweetId,
+        string calldata _name,
+        string calldata _authorID,
+        string calldata _avatar
+    ) public {
         require(tweetId < tweetCounter, "Invalid tweet ID");
 
         Tweet memory originalTweet = allTweets[tweetId];
 
-        require(!userReposts[msg.sender][originalTweet.author][tweetId], "You have already reposted this tweet!");
+        require(
+            !userReposts[msg.sender][originalTweet.author][tweetId],
+            "You have already reposted this tweet!"
+        );
 
         Tweet memory newRepost = Tweet({
             id: tweetCounter,
@@ -107,7 +191,8 @@ contract PostTweet {
             isRepost: true,
             reposter: _name,
             reposterID: _authorID,
-            reposterAvatar: _avatar
+            reposterAvatar: _avatar,
+            isMutable: false
         });
 
         allTweets.push(newRepost);
@@ -125,7 +210,8 @@ contract PostTweet {
             originalTweet.content,
             originalTweet.mediaCID,
             block.timestamp,
-            true
+            true,
+            false
         );
 
         tweetCounter++;
@@ -174,7 +260,10 @@ contract PostTweet {
         return userReposts[user][author][tweetId];
     }
 
-    function getTotalReposts(address author, uint256 tweetId) external view returns (uint256) {
+    function getTotalReposts(
+        address author,
+        uint256 tweetId
+    ) external view returns (uint256) {
         return repostCount[author][tweetId];
     }
 }

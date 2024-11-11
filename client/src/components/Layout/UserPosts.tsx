@@ -14,6 +14,7 @@ import { Tweet } from "../../types";
 import { BigNumber } from "ethers";
 import ReactLoading from "react-loading";
 import CommentModal from "../Overlay/CommentModal";
+import TweetInteractionIcons from "./TweetInteractionIcons";
 
 type UserPostsProps = {
   tweets: Tweet[];
@@ -40,6 +41,8 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
   const toggleCommentModal = () => {
     setCommentModal(!commentModal);
   };
+
+  console.log(tweets);
 
   useEffect(() => {
     const mappedTweets = tweets.map((tweet) => {
@@ -186,27 +189,29 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                   className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover bg-white"
                 />
                 <div className="flex flex-col ml-2">
-                  <div className="flex flex-col sm:flex-row">
-                    <p
-                      className="font-semibold mr-2 cursor-pointer"
-                      style={{ fontFamily: "Roboto" }}
-                      onClick={() => navigate(`/profile/${tweet.authorID}`)}
-                    >
-                      {tweet.name}
-                    </p>
-                    <p
-                      className="text-sm mr-2 text-gray-500 cursor-pointer"
-                      style={{ fontFamily: "Roboto" }}
-                      onClick={() => navigate(`/profile/${tweet.authorID}`)}
-                    >
-                      @{tweet.authorID}
-                    </p>
-                    <p
-                      className="text-sm text-gray-500"
-                      style={{ fontFamily: "Roboto" }}
-                    >
-                      {tweet.date} {tweet.month}
-                    </p>
+                  <div className="flex flex-col sm:flex-row justify-between">
+                    <div className="flex flex-row">
+                      <p
+                        className="font-semibold mr-2 cursor-pointer"
+                        style={{ fontFamily: "Roboto" }}
+                        onClick={() => navigate(`/profile/${tweet.authorID}`)}
+                      >
+                        {tweet.name}
+                      </p>
+                      <p
+                        className="text-sm mr-2 text-gray-500 cursor-pointer"
+                        style={{ fontFamily: "Roboto" }}
+                        onClick={() => navigate(`/profile/${tweet.authorID}`)}
+                      >
+                        @{tweet.authorID}
+                      </p>
+                      <p
+                        className="text-sm text-gray-500"
+                        style={{ fontFamily: "Roboto" }}
+                      >
+                        {tweet.date} {tweet.month}
+                      </p>
+                    </div>
                   </div>
                   <p
                     className="cursor-pointer"
@@ -229,72 +234,20 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
                       width={50}
                     />
                   )}
-
-                  <div className="mt-2 flex flex-row max-w-60 justify-between">
-                    {interactionIcons.map(
-                      (
-                        {
-                          icon,
-                          iconActivated,
-                          label,
-                          color,
-                          hoverColor,
-                          action,
-                        },
-                        index
-                      ) => {
-                        let isActivated = false;
-                        let displayCount = "";
-
-                        if (label === "Like") {
-                          isActivated = likedTweets[tweet.id];
-                          displayCount = likeCounts[tweet.id]?.toString() || "";
-                        } else if (label === "Comment") {
-                          isActivated = hasUserCommented[tweet.id];
-                          displayCount =
-                            totalComments[tweet.id]?.toString() || "";
-                        } else if (label === "Repost") {
-                          isActivated = repostedTweets[tweet.id];
-                          displayCount =
-                            repostCounts[tweet.id]?.toString() || "";
-                        } else if (label === "Bookmark") {
-                          isActivated = bookmarkedTweets[tweet.id];
-                          displayCount =
-                            bookmarkCounts[tweet.id]?.toString() || "";
-                        }
-
-                        return (
-                          <div key={index} className="relative">
-                            <button
-                              onClick={() => action(tweet)}
-                              onMouseEnter={() =>
-                                setHoveredIcon({ postId: tweet.id, label })
-                              }
-                              onMouseLeave={() => setHoveredIcon(null)}
-                              className={`${
-                                isActivated ? color : "text-gray-400"
-                              } ${hoverColor} hover:bg-gray-800 transition text-xl p-2 rounded-full flex items-center space-x-1`}
-                            >
-                              {isActivated ? iconActivated : icon}
-                              {displayCount && displayCount !== "0" && (
-                                <span className="text-xs">{displayCount}</span>
-                              )}
-                              <div
-                                className={`absolute top-10 left-1/3 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 ease-in-out ${
-                                  hoveredIcon?.postId === tweet.id &&
-                                  hoveredIcon.label === label
-                                    ? "opacity-100"
-                                    : "opacity-0 pointer-events-none"
-                                }`}
-                              >
-                                {label}
-                              </div>
-                            </button>
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
+                  <TweetInteractionIcons
+                    tweet={tweet}
+                    interactionIcons={interactionIcons}
+                    hoveredIcon={hoveredIcon}
+                    setHoveredIcon={setHoveredIcon}
+                    likedTweets={likedTweets}
+                    likeCounts={likeCounts}
+                    hasUserCommented={hasUserCommented}
+                    totalComments={totalComments}
+                    repostedTweets={repostedTweets}
+                    repostCounts={repostCounts}
+                    bookmarkedTweets={bookmarkedTweets}
+                    bookmarkCounts={bookmarkCounts}
+                  />
                 </div>
               </div>
             </div>

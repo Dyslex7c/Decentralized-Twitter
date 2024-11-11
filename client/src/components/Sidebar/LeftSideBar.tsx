@@ -192,7 +192,7 @@ const LeftSideBar = () => {
         </div>
 
         <button
-          className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white ml-1 p-3 px-6 lg:px-16 mb-12 mr-5 rounded-full flex items-center justify-center gap-2"
+          className="bg-[#345eeb] hover:bg-[#78c7ff] hover:text-black transition duration-300 ease-in-out text-white ml-1 p-3 px-6 lg:px-16 mb-8 mr-5 rounded-full flex items-center justify-center gap-2"
           style={{ fontWeight: 600 }}
         >
           Post
