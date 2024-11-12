@@ -4,6 +4,12 @@ pragma solidity ^0.8.17;
 
 import {FollowSystem} from "./FollowSystem.sol";
 
+/**
+ * @title PostTweet
+ * @author Ritesh Das
+ * @dev This contract allows users to post, edit, delete and repost tweets. Supports mutable and immutable tweets and keeps track of user posts
+ * @notice This contract also interacts with the FollowSystem contract to enable viewing tweets posted from the accounts whom the user has followed.
+ */
 contract PostTweet {
     FollowSystem public followSystem;
 
@@ -48,6 +54,14 @@ contract PostTweet {
         bool isMutable
     );
 
+    /**
+     * @notice Posts a new immutable tweet
+     * @param _name The name of the tweet's author
+     * @param _authorID The ID of the author
+     * @param _avatar The avatar URL of the author
+     * @param _content The content of the tweet
+     * @param _mediaCID The CID of media attached to the tweet
+     */
     function postTweet(
         string memory _name,
         string memory _authorID,
@@ -92,6 +106,14 @@ contract PostTweet {
         tweetCounter++;
     }
 
+    /**
+     * @notice Posts a new mutable tweet
+     * @param _name The name of the tweet's author
+     * @param _authorID The ID of the author
+     * @param _avatar The avatar URL of the author
+     * @param _content The content of the tweet
+     * @param _mediaCID The CID of media attached to the tweet
+     */
     function postMutableTweet(
         string calldata _name,
         string calldata _authorID,
@@ -136,6 +158,12 @@ contract PostTweet {
         tweetCounter++;
     }
 
+    /**
+     * @notice Edits an existing tweet if it is mutable
+     * @param tweetId The unique ID of the tweet to edit
+     * @param _content The new content for the tweet
+     * @param _mediaCID The new CID of media for the tweet
+     */
     function editTweet(
         uint256 tweetId,
         string memory _content,
@@ -152,6 +180,10 @@ contract PostTweet {
         tweet.mediaCID = _mediaCID;
     }
 
+    /**
+     * @notice Deletes an existing tweet if it is mutable
+     * @param tweetId The unique ID of the tweet to delete
+     */
     function deleteTweet(uint256 tweetId) public {
         Tweet storage tweet = allTweets[tweetId];
         require(
@@ -164,6 +196,13 @@ contract PostTweet {
         delete userTweets[msg.sender][tweetId];
     }
 
+    /**
+     * @notice Reposts an existing tweet
+     * @param tweetId The unique ID of the tweet to repost
+     * @param _name The name of the user reposting
+     * @param _authorID The ID of the user reposting
+     * @param _avatar The avatar URL of the user reposting
+     */
     function repostTweet(
         uint256 tweetId,
         string calldata _name,
@@ -217,16 +256,29 @@ contract PostTweet {
         tweetCounter++;
     }
 
+    /**
+     * @notice Returns all tweets
+     * @return Array of all tweets in the contract
+     */
     function getAllTweets() public view returns (Tweet[] memory) {
         return allTweets;
     }
 
+    /**
+     * @notice Returns tweets by a specific user
+     * @param _user The address of the user to get tweets for
+     * @return Array of tweets by the specified user
+     */
     function getTweetsByUser(
         address _user
     ) public view returns (Tweet[] memory) {
         return userTweets[_user];
     }
 
+    /**
+     * @notice Returns tweets from accounts followed by the caller
+     * @return Array of tweets by followed users
+     */
     function getTweetsByFollowing() public view returns (Tweet[] memory) {
         address[] memory followedPersons = followSystem.getFollowing(
             msg.sender
@@ -234,16 +286,16 @@ contract PostTweet {
 
         uint256 totalTweetCount = 0;
 
-        for (uint i = 0; i < followedPersons.length; i++) {
+        for (uint256 i = 0; i < followedPersons.length; i++) {
             totalTweetCount += userTweets[followedPersons[i]].length;
         }
 
         Tweet[] memory allFollowedTweets = new Tweet[](totalTweetCount);
 
         uint256 currentIndex = 0;
-        for (uint i = 0; i < followedPersons.length; i++) {
+        for (uint256 i = 0; i < followedPersons.length; i++) {
             Tweet[] memory tweets = userTweets[followedPersons[i]];
-            for (uint j = 0; j < tweets.length; j++) {
+            for (uint256 j = 0; j < tweets.length; j++) {
                 allFollowedTweets[currentIndex] = tweets[j];
                 currentIndex++;
             }
@@ -252,6 +304,13 @@ contract PostTweet {
         return allFollowedTweets;
     }
 
+    /**
+     * @notice Checks if the user has reposted or not
+     * @param user The address of the user who has reposted
+     * @param author The address of the user who posted the original tweet
+     * @param tweetId The unique ID of the original tweet
+     * @return A boolean value based on whether the user has reposted or not
+     */
     function hasUserReposted(
         address user,
         address author,
@@ -260,6 +319,12 @@ contract PostTweet {
         return userReposts[user][author][tweetId];
     }
 
+    /**
+     * @notice Returns the repost count of a particular tweet
+     * @param author The address of the user who posted the tweet
+     * @param tweetId The unique ID of the tweet
+     * @return The total repost count for a specific tweet as an unsigned integer
+     */
     function getTotalReposts(
         address author,
         uint256 tweetId

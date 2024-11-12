@@ -4,6 +4,12 @@ pragma solidity ^0.8.17;
 
 import {PostTweet} from "./PostTweet.sol";
 
+/**
+ * @title PostInteractions
+ * @author Ritesh Das
+ * @notice This contract enables users to like, leave comments, and bookmark tweets.
+ * @dev Interactions are stored in mappings which can be retrieved anytime, and events are emitted for each such interaction.
+ */
 contract PostInteractions {
     PostTweet public postTweet;
 
@@ -69,6 +75,11 @@ contract PostInteractions {
         postTweet = PostTweet(_postTweetAddress);
     }
 
+    /**
+     * @notice Allows a user to like a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     */
     function likeTweet(address author, uint256 tweetId) external {
         require(
             !likes[msg.sender][author][tweetId],
@@ -81,6 +92,11 @@ contract PostInteractions {
         emit TweetLiked(msg.sender, author, tweetId);
     }
 
+    /**
+     * @notice Allows a user to unlike a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     */
     function unlikeTweet(address author, uint256 tweetId) external {
         require(
             likes[msg.sender][author][tweetId],
@@ -93,6 +109,12 @@ contract PostInteractions {
         emit TweetUnliked(msg.sender, author, tweetId);
     }
 
+    /**
+     * @notice Retrieves the total number of likes for a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return The total number of likes
+     */
     function getTotalLikes(
         address author,
         uint256 tweetId
@@ -100,6 +122,12 @@ contract PostInteractions {
         return likeCount[author][tweetId];
     }
 
+    /**
+     * @notice Checks if the caller has liked a specific tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return A boolean value based on whether the user has liked the tweet or not
+     */
     function isLiked(
         address author,
         uint256 tweetId
@@ -107,6 +135,16 @@ contract PostInteractions {
         return likes[msg.sender][author][tweetId];
     }
 
+    /**
+     * @notice Allows a user to leave a comment in a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @param _name The name of the commenter
+     * @param _commenterID The unique userID of the commenter
+     * @param _avatar The avatar of the commenter
+     * @param _content The content of the comment
+     * @param _mediaCID The CID of media attached to the comment
+     */
     function addComment(
         address author,
         uint256 tweetId,
@@ -147,6 +185,12 @@ contract PostInteractions {
         commentCounter++;
     }
 
+    /**
+     * @notice Retrieves all the comments for a particular tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return Array of comments of the tweet
+     */
     function getComments(
         address author,
         uint256 tweetId
@@ -154,6 +198,12 @@ contract PostInteractions {
         return comments[author][tweetId];
     }
 
+    /**
+     * @notice Retrieves the total number of comments for a particular tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return The total number of comments of the tweet
+     */
     function getTotalComments(
         address author,
         uint256 tweetId
@@ -161,6 +211,12 @@ contract PostInteractions {
         return comments[author][tweetId].length;
     }
 
+    /**
+     * @notice Checks if the caller has commented on a specific tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return A boolean value based on whether the caller has commented on the tweet or not
+     */
     function hasUserCommented(
         address author,
         uint256 tweetId
@@ -174,6 +230,11 @@ contract PostInteractions {
         return false;
     }
 
+    /**
+     * @notice Allows a user to bookmark a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     */
     function bookmarkTweet(address author, uint256 tweetId) external {
         require(
             !bookmarks[msg.sender][author][tweetId],
@@ -186,6 +247,11 @@ contract PostInteractions {
         emit TweetBookmarked(msg.sender, author, tweetId);
     }
 
+    /**
+     * @notice Allows a user to unbookmark a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     */
     function unbookmarkTweet(address author, uint256 tweetId) external {
         require(
             bookmarks[msg.sender][author][tweetId],
@@ -198,6 +264,12 @@ contract PostInteractions {
         emit TweetUnbookmarked(msg.sender, author, tweetId);
     }
 
+    /**
+     * @notice Retrieves the total number of bookmarks for a tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return The total number of bookmarks
+     */
     function getTotalBookmarks(
         address author,
         uint256 tweetId
@@ -205,6 +277,12 @@ contract PostInteractions {
         return bookmarkCount[author][tweetId];
     }
 
+    /**
+     * @notice Checks if the caller has bookmarked a specific tweet
+     * @param author The address of the tweet author
+     * @param tweetId The unique ID of the tweet
+     * @return A boolean value based on whether the user has bookmarked the tweet or not
+     */
     function hasUserBookmarked(
         address author,
         uint256 tweetId
