@@ -71,8 +71,9 @@ contract PostInteractions {
 
     uint256 public commentCounter;
 
-    constructor(address _postTweetAddress) {
+    constructor(address _postTweetAddress, uint256 _initialCommentCounter) {
         postTweet = PostTweet(_postTweetAddress);
+        commentCounter = _initialCommentCounter;
     }
 
     /**

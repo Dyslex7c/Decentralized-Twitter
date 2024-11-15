@@ -15,6 +15,7 @@ import { BigNumber } from "ethers";
 import ReactLoading from "react-loading";
 import CommentModal from "../Overlay/CommentModal";
 import TweetInteractionIcons from "./TweetInteractionIcons";
+import { mergeSortTweets } from "../../utils/sortTweets";
 
 type UserPostsProps = {
   tweets: Tweet[];
@@ -44,6 +45,21 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
 
   console.log(tweets);
 
+  const { likeCounts, likedTweets, likeTweet, unlikeTweet } = useLikeStatus(
+    tweets,
+    contract
+  );
+
+  const { totalComments, hasUserCommented } = useCommentHandler(
+    tweets,
+    contract
+  );
+
+  const { repostTweet, repostCounts, repostedTweets } = useRepostStatus(
+    tweets,
+    tweetContract
+  );
+
   useEffect(() => {
     const mappedTweets = tweets.map((tweet) => {
       const timestamp = BigNumber.from(tweet.timestamp._hex).toNumber();
@@ -54,18 +70,16 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
         month: date.toLocaleDateString("default", { month: "short" }),
       };
     });
-    setUpdatedTweets(mappedTweets);
-  }, [tweets]);
 
-  const { likeCounts, likedTweets, likeTweet, unlikeTweet } = useLikeStatus(
-    tweets,
-    contract
-  );
+    const sortedTweets = mergeSortTweets(
+      mappedTweets,
+      likeCounts,
+      totalComments,
+      repostCounts
+    );
 
-  const { totalComments, hasUserCommented } = useCommentHandler(
-    tweets,
-    contract
-  );
+    setUpdatedTweets(sortedTweets);
+  }, [tweets, likeCounts, totalComments, repostCounts]);
 
   const handleComment = (tweet: Tweet) => {
     setActivatedTweet(tweet);
@@ -77,11 +91,6 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
     console.log("reposting");
     repostTweet(tweet, user, currentUserID);
   };
-
-  const { repostTweet, repostCounts, repostedTweets } = useRepostStatus(
-    tweets,
-    tweetContract
-  );
 
   const { bookmarkCounts, bookmarkedTweets, bookmarkTweet, unbookmarkTweet } =
     useBookmarkStatus(tweets, contract);
