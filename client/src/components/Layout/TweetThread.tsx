@@ -138,7 +138,7 @@ const TweetThread = () => {
         />
       )}
       <ToastContainer />
-      <div className="fixed w-full bg-black/[.5] z-40 flex flex-row items-center p-4">
+      <div className="fixed w-[34rem] bg-black/[.5] z-40 flex flex-row items-center p-4">
         <IoIosReturnLeft
           onClick={() => navigate("/home")}
           className="text-2xl mr-4 cursor-pointer"
@@ -149,7 +149,7 @@ const TweetThread = () => {
           </p>
         </div>
       </div>
-      <div className="p-4 border-b border-gray-700">
+      <div className="p-4 border-b border-r border-gray-700 w-[36rem]">
         <div
           className="mt-16 flex items-center"
           style={{ fontFamily: "Roboto" }}
@@ -247,7 +247,9 @@ const TweetThread = () => {
           )}
         </div>
       </div>
-      <UserPosts tweets={comments} isProfile={false} />
+      <div className="w-[36rem] border-r border-gray-700">
+        <UserPosts tweets={comments} isProfile={false} />
+      </div>
     </>
   );
 };

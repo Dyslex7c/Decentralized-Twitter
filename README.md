@@ -16,6 +16,16 @@ Your Data, Your Control: There are no central servers. Your posts are managed th
 
 Ethereum Wallet Login: Simply connect with your MetaMask wallet to go pseudonymous and continue to post, read, and engage with others. All interactions are between your wallet and the blockchain.
 
+## dApp Screenshots
+
+![alt text](client/src/assets/screenshot2.png)
+
+![alt text](client/src/assets/screenshot3.png)
+
+![alt text](client/src/assets/screenshot4.png)
+
+![alt text](client/src/assets/screenshot5.png)
+
 ## Usage
 
 Clone the repository if you haven't already

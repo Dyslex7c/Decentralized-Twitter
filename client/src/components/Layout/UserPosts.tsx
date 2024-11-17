@@ -138,7 +138,7 @@ const UserPosts = ({ tweets, isProfile }: UserPostsProps) => {
 
         return (
           <div key={tweet.id} className="border-b border-gray-700">
-            <div className="m-4 max-w-4xl">
+            <div className="p-4 max-w-4xl">
               {tweet.isRepost && (
                 <div className="flex flex-col items-start mb-2 text-gray-500">
                   <div className="flex flex-row">
