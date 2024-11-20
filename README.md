@@ -74,3 +74,7 @@ make deploy
 ```
 
 Finally, run `npm start` and you're good to go.
+
+## Disclaimer
+
+>These smart contracts and the accompanying web application are provided "as is." No guarantee, representation, or warranty is made, express or implied, regarding the safety, correctness, or functionality of the user interface or the smart contracts. They have not undergone any formal audit, and therefore, there is no assurance that they will operate as intended. Users may encounter delays, failures, errors, omissions, or loss of transmitted information. Ritesh Das is not liable for any of the aforementioned issues or for any losses incurred. Users are advised to proceed with caution and use the application ONLY on localhost or a testnet such as Polygon Amoy, and NOT the mainnet.
